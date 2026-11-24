@@ -1,0 +1,2949 @@
+{
+  "schema": 1,
+  "slug": "liars-dice",
+  "hash": "",
+  "bundles": {
+    "windows": "",
+    "android": ""
+  },
+  "objects": {
+    "billboard": {
+      "path": "billboard display",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "display": {
+      "path": "billboard display/Text (TMP)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "rules": {
+      "path": "billboard display/Text rules",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "master": {
+      "path": "master script",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "speaker": {
+      "path": "AudioSource",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "proximity": {
+      "path": "HandTrackerToggle",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "menu": {
+      "path": "Menu Options",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "onesWildButton": {
+      "path": "Menu Options/1s wild/button",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "onesWildCheck": {
+      "path": "Menu Options/1s wild/button/Image",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "volumeSlider": {
+      "path": "Menu Options/Volume/Slider",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "soundButton": {
+      "path": "Menu Options/mute sound/button",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "soundCheck": {
+      "path": "Menu Options/mute sound/button/Image",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "leaveGameButton": {
+      "path": "Menu Options/Leave game/button",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p1": {
+      "path": "master script/p1",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_die0": {
+      "path": "master script/p1/dice (0)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_die1": {
+      "path": "master script/p1/dice (1)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_die2": {
+      "path": "master script/p1/dice (2)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_die3": {
+      "path": "master script/p1/dice (3)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_die4": {
+      "path": "master script/p1/dice (4)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_canvas": {
+      "path": "master script/p1/Canvas",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_name": {
+      "path": "master script/p1/Canvas/name display",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_preGame": {
+      "path": "master script/p1/Canvas/Pre-Game",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_join": {
+      "path": "master script/p1/Canvas/Pre-Game/Join",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_leave": {
+      "path": "master script/p1/Canvas/Pre-Game/leave",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_start": {
+      "path": "master script/p1/Canvas/Pre-Game/Start",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_inGame": {
+      "path": "master script/p1/Canvas/InGame",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_one": {
+      "path": "master script/p1/Canvas/InGame/Num Selection/one",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_two": {
+      "path": "master script/p1/Canvas/InGame/Num Selection/two",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_three": {
+      "path": "master script/p1/Canvas/InGame/Num Selection/three",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_four": {
+      "path": "master script/p1/Canvas/InGame/Num Selection/four",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_five": {
+      "path": "master script/p1/Canvas/InGame/Num Selection/five",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_six": {
+      "path": "master script/p1/Canvas/InGame/Num Selection/six",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_wild": {
+      "path": "master script/p1/Canvas/InGame/Num Selection/one/wild",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_plus": {
+      "path": "master script/p1/Canvas/InGame/+&-/+",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_minus": {
+      "path": "master script/p1/Canvas/InGame/+&-/-",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_number": {
+      "path": "master script/p1/Canvas/InGame/+&-/result",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_submit": {
+      "path": "master script/p1/Canvas/InGame/Submit",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_callIt": {
+      "path": "master script/p1/Canvas/InGame/Call it",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_continue": {
+      "path": "master script/p1/Canvas/Continue",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_rules": {
+      "path": "master script/p1/Canvas/Rules",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_speaker": {
+      "path": "master script/p1/Canvas/AudioSource",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p1_join_sel": {
+      "path": "master script/p1/Canvas/Pre-Game/Join/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p1_leave_sel": {
+      "path": "master script/p1/Canvas/Pre-Game/leave/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p1_start_sel": {
+      "path": "master script/p1/Canvas/Pre-Game/Start/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p1_continue_sel": {
+      "path": "master script/p1/Canvas/Continue/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p1_rules_sel": {
+      "path": "master script/p1/Canvas/Rules/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p1_submit_sel": {
+      "path": "master script/p1/Canvas/InGame/Submit/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p1_callIt_sel": {
+      "path": "master script/p1/Canvas/InGame/Call it/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p1_one_sel": {
+      "path": "master script/p1/Canvas/InGame/Num Selection/one/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p1_two_sel": {
+      "path": "master script/p1/Canvas/InGame/Num Selection/two/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p1_three_sel": {
+      "path": "master script/p1/Canvas/InGame/Num Selection/three/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p1_four_sel": {
+      "path": "master script/p1/Canvas/InGame/Num Selection/four/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p1_five_sel": {
+      "path": "master script/p1/Canvas/InGame/Num Selection/five/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p1_six_sel": {
+      "path": "master script/p1/Canvas/InGame/Num Selection/six/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p1_plus_sel": {
+      "path": "master script/p1/Canvas/InGame/+&-/+/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p1_minus_sel": {
+      "path": "master script/p1/Canvas/InGame/+&-/-/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p2": {
+      "path": "master script/p2",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_die0": {
+      "path": "master script/p2/dice (0)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_die1": {
+      "path": "master script/p2/dice (1)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_die2": {
+      "path": "master script/p2/dice (2)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_die3": {
+      "path": "master script/p2/dice (3)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_die4": {
+      "path": "master script/p2/dice (4)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_canvas": {
+      "path": "master script/p2/Canvas",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_name": {
+      "path": "master script/p2/Canvas/name display",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_preGame": {
+      "path": "master script/p2/Canvas/Pre-Game",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_join": {
+      "path": "master script/p2/Canvas/Pre-Game/Join",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_leave": {
+      "path": "master script/p2/Canvas/Pre-Game/leave",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_start": {
+      "path": "master script/p2/Canvas/Pre-Game/Start",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_inGame": {
+      "path": "master script/p2/Canvas/InGame",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_one": {
+      "path": "master script/p2/Canvas/InGame/Num Selection/one",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_two": {
+      "path": "master script/p2/Canvas/InGame/Num Selection/two",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_three": {
+      "path": "master script/p2/Canvas/InGame/Num Selection/three",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_four": {
+      "path": "master script/p2/Canvas/InGame/Num Selection/four",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_five": {
+      "path": "master script/p2/Canvas/InGame/Num Selection/five",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_six": {
+      "path": "master script/p2/Canvas/InGame/Num Selection/six",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_wild": {
+      "path": "master script/p2/Canvas/InGame/Num Selection/one/wild",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_plus": {
+      "path": "master script/p2/Canvas/InGame/+&-/+",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_minus": {
+      "path": "master script/p2/Canvas/InGame/+&-/-",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_number": {
+      "path": "master script/p2/Canvas/InGame/+&-/result",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_submit": {
+      "path": "master script/p2/Canvas/InGame/Submit",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_callIt": {
+      "path": "master script/p2/Canvas/InGame/Call it",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_continue": {
+      "path": "master script/p2/Canvas/Continue",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_rules": {
+      "path": "master script/p2/Canvas/Rules",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_speaker": {
+      "path": "master script/p2/Canvas/AudioSource",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p2_join_sel": {
+      "path": "master script/p2/Canvas/Pre-Game/Join/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p2_leave_sel": {
+      "path": "master script/p2/Canvas/Pre-Game/leave/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p2_start_sel": {
+      "path": "master script/p2/Canvas/Pre-Game/Start/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p2_continue_sel": {
+      "path": "master script/p2/Canvas/Continue/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p2_rules_sel": {
+      "path": "master script/p2/Canvas/Rules/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p2_submit_sel": {
+      "path": "master script/p2/Canvas/InGame/Submit/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p2_callIt_sel": {
+      "path": "master script/p2/Canvas/InGame/Call it/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p2_one_sel": {
+      "path": "master script/p2/Canvas/InGame/Num Selection/one/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p2_two_sel": {
+      "path": "master script/p2/Canvas/InGame/Num Selection/two/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p2_three_sel": {
+      "path": "master script/p2/Canvas/InGame/Num Selection/three/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p2_four_sel": {
+      "path": "master script/p2/Canvas/InGame/Num Selection/four/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p2_five_sel": {
+      "path": "master script/p2/Canvas/InGame/Num Selection/five/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p2_six_sel": {
+      "path": "master script/p2/Canvas/InGame/Num Selection/six/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p2_plus_sel": {
+      "path": "master script/p2/Canvas/InGame/+&-/+/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p2_minus_sel": {
+      "path": "master script/p2/Canvas/InGame/+&-/-/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p3": {
+      "path": "master script/p3",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_die0": {
+      "path": "master script/p3/dice (0)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_die1": {
+      "path": "master script/p3/dice (1)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_die2": {
+      "path": "master script/p3/dice (2)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_die3": {
+      "path": "master script/p3/dice (3)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_die4": {
+      "path": "master script/p3/dice (4)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_canvas": {
+      "path": "master script/p3/Canvas",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_name": {
+      "path": "master script/p3/Canvas/name display",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_preGame": {
+      "path": "master script/p3/Canvas/Pre-Game",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_join": {
+      "path": "master script/p3/Canvas/Pre-Game/Join",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_leave": {
+      "path": "master script/p3/Canvas/Pre-Game/leave",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_start": {
+      "path": "master script/p3/Canvas/Pre-Game/Start",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_inGame": {
+      "path": "master script/p3/Canvas/InGame",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_one": {
+      "path": "master script/p3/Canvas/InGame/Num Selection/one",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_two": {
+      "path": "master script/p3/Canvas/InGame/Num Selection/two",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_three": {
+      "path": "master script/p3/Canvas/InGame/Num Selection/three",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_four": {
+      "path": "master script/p3/Canvas/InGame/Num Selection/four",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_five": {
+      "path": "master script/p3/Canvas/InGame/Num Selection/five",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_six": {
+      "path": "master script/p3/Canvas/InGame/Num Selection/six",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_wild": {
+      "path": "master script/p3/Canvas/InGame/Num Selection/one/wild",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_plus": {
+      "path": "master script/p3/Canvas/InGame/+&-/+",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_minus": {
+      "path": "master script/p3/Canvas/InGame/+&-/-",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_number": {
+      "path": "master script/p3/Canvas/InGame/+&-/result",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_submit": {
+      "path": "master script/p3/Canvas/InGame/Submit",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_callIt": {
+      "path": "master script/p3/Canvas/InGame/Call it",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_continue": {
+      "path": "master script/p3/Canvas/Continue",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_rules": {
+      "path": "master script/p3/Canvas/Rules",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_speaker": {
+      "path": "master script/p3/Canvas/AudioSource",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p3_join_sel": {
+      "path": "master script/p3/Canvas/Pre-Game/Join/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p3_leave_sel": {
+      "path": "master script/p3/Canvas/Pre-Game/leave/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p3_start_sel": {
+      "path": "master script/p3/Canvas/Pre-Game/Start/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p3_continue_sel": {
+      "path": "master script/p3/Canvas/Continue/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p3_rules_sel": {
+      "path": "master script/p3/Canvas/Rules/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p3_submit_sel": {
+      "path": "master script/p3/Canvas/InGame/Submit/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p3_callIt_sel": {
+      "path": "master script/p3/Canvas/InGame/Call it/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p3_one_sel": {
+      "path": "master script/p3/Canvas/InGame/Num Selection/one/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p3_two_sel": {
+      "path": "master script/p3/Canvas/InGame/Num Selection/two/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p3_three_sel": {
+      "path": "master script/p3/Canvas/InGame/Num Selection/three/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p3_four_sel": {
+      "path": "master script/p3/Canvas/InGame/Num Selection/four/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p3_five_sel": {
+      "path": "master script/p3/Canvas/InGame/Num Selection/five/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p3_six_sel": {
+      "path": "master script/p3/Canvas/InGame/Num Selection/six/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p3_plus_sel": {
+      "path": "master script/p3/Canvas/InGame/+&-/+/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p3_minus_sel": {
+      "path": "master script/p3/Canvas/InGame/+&-/-/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p4": {
+      "path": "master script/p4",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_die0": {
+      "path": "master script/p4/dice (0)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_die1": {
+      "path": "master script/p4/dice (1)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_die2": {
+      "path": "master script/p4/dice (2)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_die3": {
+      "path": "master script/p4/dice (3)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_die4": {
+      "path": "master script/p4/dice (4)",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_canvas": {
+      "path": "master script/p4/Canvas",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_name": {
+      "path": "master script/p4/Canvas/name display",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_preGame": {
+      "path": "master script/p4/Canvas/Pre-Game",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_join": {
+      "path": "master script/p4/Canvas/Pre-Game/Join",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_leave": {
+      "path": "master script/p4/Canvas/Pre-Game/leave",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_start": {
+      "path": "master script/p4/Canvas/Pre-Game/Start",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_inGame": {
+      "path": "master script/p4/Canvas/InGame",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_one": {
+      "path": "master script/p4/Canvas/InGame/Num Selection/one",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_two": {
+      "path": "master script/p4/Canvas/InGame/Num Selection/two",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_three": {
+      "path": "master script/p4/Canvas/InGame/Num Selection/three",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_four": {
+      "path": "master script/p4/Canvas/InGame/Num Selection/four",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_five": {
+      "path": "master script/p4/Canvas/InGame/Num Selection/five",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_six": {
+      "path": "master script/p4/Canvas/InGame/Num Selection/six",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_wild": {
+      "path": "master script/p4/Canvas/InGame/Num Selection/one/wild",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_plus": {
+      "path": "master script/p4/Canvas/InGame/+&-/+",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_minus": {
+      "path": "master script/p4/Canvas/InGame/+&-/-",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_number": {
+      "path": "master script/p4/Canvas/InGame/+&-/result",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_submit": {
+      "path": "master script/p4/Canvas/InGame/Submit",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_callIt": {
+      "path": "master script/p4/Canvas/InGame/Call it",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_continue": {
+      "path": "master script/p4/Canvas/Continue",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_rules": {
+      "path": "master script/p4/Canvas/Rules",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_speaker": {
+      "path": "master script/p4/Canvas/AudioSource",
+      "sync": "none",
+      "grab": false,
+      "click": false,
+      "seat": false
+    },
+    "p4_join_sel": {
+      "path": "master script/p4/Canvas/Pre-Game/Join/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p4_leave_sel": {
+      "path": "master script/p4/Canvas/Pre-Game/leave/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p4_start_sel": {
+      "path": "master script/p4/Canvas/Pre-Game/Start/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p4_continue_sel": {
+      "path": "master script/p4/Canvas/Continue/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p4_rules_sel": {
+      "path": "master script/p4/Canvas/Rules/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p4_submit_sel": {
+      "path": "master script/p4/Canvas/InGame/Submit/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p4_callIt_sel": {
+      "path": "master script/p4/Canvas/InGame/Call it/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p4_one_sel": {
+      "path": "master script/p4/Canvas/InGame/Num Selection/one/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p4_two_sel": {
+      "path": "master script/p4/Canvas/InGame/Num Selection/two/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p4_three_sel": {
+      "path": "master script/p4/Canvas/InGame/Num Selection/three/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p4_four_sel": {
+      "path": "master script/p4/Canvas/InGame/Num Selection/four/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p4_five_sel": {
+      "path": "master script/p4/Canvas/InGame/Num Selection/five/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p4_six_sel": {
+      "path": "master script/p4/Canvas/InGame/Num Selection/six/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p4_plus_sel": {
+      "path": "master script/p4/Canvas/InGame/+&-/+/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    },
+    "p4_minus_sel": {
+      "path": "master script/p4/Canvas/InGame/+&-/-/selector",
+      "sync": "none",
+      "grab": false,
+      "click": true,
+      "seat": false
+    }
+  },
+  "refs": [
+    "billboard",
+    "display",
+    "rules",
+    "speaker",
+    "menu",
+    "onesWildCheck",
+    "volumeSlider",
+    "soundCheck",
+    "p1",
+    "p1_die0",
+    "p1_die1",
+    "p1_die2",
+    "p1_die3",
+    "p1_die4",
+    "p1_canvas",
+    "p1_name",
+    "p1_preGame",
+    "p1_join",
+    "p1_leave",
+    "p1_start",
+    "p1_inGame",
+    "p1_one",
+    "p1_two",
+    "p1_three",
+    "p1_four",
+    "p1_five",
+    "p1_six",
+    "p1_wild",
+    "p1_plus",
+    "p1_minus",
+    "p1_number",
+    "p1_submit",
+    "p1_callIt",
+    "p1_continue",
+    "p1_rules",
+    "p1_speaker",
+    "p2",
+    "p2_die0",
+    "p2_die1",
+    "p2_die2",
+    "p2_die3",
+    "p2_die4",
+    "p2_canvas",
+    "p2_name",
+    "p2_preGame",
+    "p2_join",
+    "p2_leave",
+    "p2_start",
+    "p2_inGame",
+    "p2_one",
+    "p2_two",
+    "p2_three",
+    "p2_four",
+    "p2_five",
+    "p2_six",
+    "p2_wild",
+    "p2_plus",
+    "p2_minus",
+    "p2_number",
+    "p2_submit",
+    "p2_callIt",
+    "p2_continue",
+    "p2_rules",
+    "p2_speaker",
+    "p3",
+    "p3_die0",
+    "p3_die1",
+    "p3_die2",
+    "p3_die3",
+    "p3_die4",
+    "p3_canvas",
+    "p3_name",
+    "p3_preGame",
+    "p3_join",
+    "p3_leave",
+    "p3_start",
+    "p3_inGame",
+    "p3_one",
+    "p3_two",
+    "p3_three",
+    "p3_four",
+    "p3_five",
+    "p3_six",
+    "p3_wild",
+    "p3_plus",
+    "p3_minus",
+    "p3_number",
+    "p3_submit",
+    "p3_callIt",
+    "p3_continue",
+    "p3_rules",
+    "p3_speaker",
+    "p4",
+    "p4_die0",
+    "p4_die1",
+    "p4_die2",
+    "p4_die3",
+    "p4_die4",
+    "p4_canvas",
+    "p4_name",
+    "p4_preGame",
+    "p4_join",
+    "p4_leave",
+    "p4_start",
+    "p4_inGame",
+    "p4_one",
+    "p4_two",
+    "p4_three",
+    "p4_four",
+    "p4_five",
+    "p4_six",
+    "p4_wild",
+    "p4_plus",
+    "p4_minus",
+    "p4_number",
+    "p4_submit",
+    "p4_callIt",
+    "p4_continue",
+    "p4_rules",
+    "p4_speaker"
+  ],
+  "behaviours": [
+    {
+      "id": "master",
+      "type": "LiarsDiceMaster",
+      "object": "master",
+      "fields": {
+        "materialFloatName": "_frame",
+        "onesWild": true,
+        "onesWildStateVisual": {
+          "$obj": "onesWildCheck"
+        },
+        "displayText": {
+          "$comp": "display",
+          "kind": "TMP"
+        },
+        "rulesText": {
+          "$comp": "rules",
+          "kind": "TMP"
+        },
+        "proximityEnable": {
+          "$beh": "prox"
+        },
+        "TruthContestSfx": {
+          "$clip": 0,
+          "on": "speaker"
+        },
+        "LiarContestSfx": {
+          "$clip": 1,
+          "on": "speaker"
+        },
+        "DiceRollSmallSfx": {
+          "$clip": 2,
+          "on": "speaker"
+        },
+        "DiceRollLargeSfx": {
+          "$clip": 3,
+          "on": "speaker"
+        },
+        "gameEndSfx": {
+          "$clip": 4,
+          "on": "speaker"
+        },
+        "speaker": {
+          "$comp": "speaker",
+          "kind": "AudioSource"
+        },
+        "audioStateVisual": {
+          "$obj": "soundCheck"
+        },
+        "slider": {
+          "$obj": "volumeSlider"
+        },
+        "playerHandles": [
+          {
+            "$beh": "p1"
+          },
+          {
+            "$beh": "p2"
+          },
+          {
+            "$beh": "p3"
+          },
+          {
+            "$beh": "p4"
+          }
+        ],
+        "diceMesh": [
+          {
+            "$comp": "p1_die0",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p1_die1",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p1_die2",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p1_die3",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p1_die4",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p2_die0",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p2_die1",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p2_die2",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p2_die3",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p2_die4",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p3_die0",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p3_die1",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p3_die2",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p3_die3",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p3_die4",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p4_die0",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p4_die1",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p4_die2",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p4_die3",
+            "kind": "Renderer"
+          },
+          {
+            "$comp": "p4_die4",
+            "kind": "Renderer"
+          }
+        ]
+      }
+    },
+    {
+      "id": "p1",
+      "type": "PlayerHandle",
+      "object": "p1",
+      "fields": {
+        "numButtons": [
+          {
+            "$obj": "p1_one"
+          },
+          {
+            "$obj": "p1_two"
+          },
+          {
+            "$obj": "p1_three"
+          },
+          {
+            "$obj": "p1_four"
+          },
+          {
+            "$obj": "p1_five"
+          },
+          {
+            "$obj": "p1_six"
+          }
+        ],
+        "otherButtons": [
+          {
+            "$obj": "p1_plus"
+          },
+          {
+            "$obj": "p1_minus"
+          },
+          {
+            "$obj": "p1_submit"
+          },
+          {
+            "$obj": "p1_callIt"
+          }
+        ],
+        "numberDisplay": {
+          "$comp": "p1_number",
+          "kind": "TMP"
+        },
+        "playerNameDisplay": {
+          "$comp": "p1_name",
+          "kind": "TMP"
+        },
+        "joinUi": {
+          "$obj": "p1_join"
+        },
+        "leaveUi": {
+          "$obj": "p1_leave"
+        },
+        "startUi": {
+          "$obj": "p1_start"
+        },
+        "continueUi": {
+          "$obj": "p1_continue"
+        },
+        "preGameUi": {
+          "$obj": "p1_preGame"
+        },
+        "inGameUi": {
+          "$obj": "p1_inGame"
+        },
+        "wildIconUi": {
+          "$obj": "p1_wild"
+        },
+        "localSelectionSfx": {
+          "$clip": 0,
+          "on": "p1_speaker"
+        },
+        "altSelectionSfx": {
+          "$clip": 1,
+          "on": "p1_speaker"
+        },
+        "turnNotificationSfx": {
+          "$clip": 2,
+          "on": "p1_speaker"
+        },
+        "speaker": {
+          "$comp": "p1_speaker",
+          "kind": "AudioSource"
+        },
+        "diceMaster": {
+          "$beh": "master"
+        }
+      }
+    },
+    {
+      "id": "p2",
+      "type": "PlayerHandle",
+      "object": "p2",
+      "fields": {
+        "numButtons": [
+          {
+            "$obj": "p2_one"
+          },
+          {
+            "$obj": "p2_two"
+          },
+          {
+            "$obj": "p2_three"
+          },
+          {
+            "$obj": "p2_four"
+          },
+          {
+            "$obj": "p2_five"
+          },
+          {
+            "$obj": "p2_six"
+          }
+        ],
+        "otherButtons": [
+          {
+            "$obj": "p2_plus"
+          },
+          {
+            "$obj": "p2_minus"
+          },
+          {
+            "$obj": "p2_submit"
+          },
+          {
+            "$obj": "p2_callIt"
+          }
+        ],
+        "numberDisplay": {
+          "$comp": "p2_number",
+          "kind": "TMP"
+        },
+        "playerNameDisplay": {
+          "$comp": "p2_name",
+          "kind": "TMP"
+        },
+        "joinUi": {
+          "$obj": "p2_join"
+        },
+        "leaveUi": {
+          "$obj": "p2_leave"
+        },
+        "startUi": {
+          "$obj": "p2_start"
+        },
+        "continueUi": {
+          "$obj": "p2_continue"
+        },
+        "preGameUi": {
+          "$obj": "p2_preGame"
+        },
+        "inGameUi": {
+          "$obj": "p2_inGame"
+        },
+        "wildIconUi": {
+          "$obj": "p2_wild"
+        },
+        "localSelectionSfx": {
+          "$clip": 0,
+          "on": "p2_speaker"
+        },
+        "altSelectionSfx": {
+          "$clip": 1,
+          "on": "p2_speaker"
+        },
+        "turnNotificationSfx": {
+          "$clip": 2,
+          "on": "p2_speaker"
+        },
+        "speaker": {
+          "$comp": "p2_speaker",
+          "kind": "AudioSource"
+        },
+        "diceMaster": {
+          "$beh": "master"
+        }
+      }
+    },
+    {
+      "id": "p3",
+      "type": "PlayerHandle",
+      "object": "p3",
+      "fields": {
+        "numButtons": [
+          {
+            "$obj": "p3_one"
+          },
+          {
+            "$obj": "p3_two"
+          },
+          {
+            "$obj": "p3_three"
+          },
+          {
+            "$obj": "p3_four"
+          },
+          {
+            "$obj": "p3_five"
+          },
+          {
+            "$obj": "p3_six"
+          }
+        ],
+        "otherButtons": [
+          {
+            "$obj": "p3_plus"
+          },
+          {
+            "$obj": "p3_minus"
+          },
+          {
+            "$obj": "p3_submit"
+          },
+          {
+            "$obj": "p3_callIt"
+          }
+        ],
+        "numberDisplay": {
+          "$comp": "p3_number",
+          "kind": "TMP"
+        },
+        "playerNameDisplay": {
+          "$comp": "p3_name",
+          "kind": "TMP"
+        },
+        "joinUi": {
+          "$obj": "p3_join"
+        },
+        "leaveUi": {
+          "$obj": "p3_leave"
+        },
+        "startUi": {
+          "$obj": "p3_start"
+        },
+        "continueUi": {
+          "$obj": "p3_continue"
+        },
+        "preGameUi": {
+          "$obj": "p3_preGame"
+        },
+        "inGameUi": {
+          "$obj": "p3_inGame"
+        },
+        "wildIconUi": {
+          "$obj": "p3_wild"
+        },
+        "localSelectionSfx": {
+          "$clip": 0,
+          "on": "p3_speaker"
+        },
+        "altSelectionSfx": {
+          "$clip": 1,
+          "on": "p3_speaker"
+        },
+        "turnNotificationSfx": {
+          "$clip": 2,
+          "on": "p3_speaker"
+        },
+        "speaker": {
+          "$comp": "p3_speaker",
+          "kind": "AudioSource"
+        },
+        "diceMaster": {
+          "$beh": "master"
+        }
+      }
+    },
+    {
+      "id": "p4",
+      "type": "PlayerHandle",
+      "object": "p4",
+      "fields": {
+        "numButtons": [
+          {
+            "$obj": "p4_one"
+          },
+          {
+            "$obj": "p4_two"
+          },
+          {
+            "$obj": "p4_three"
+          },
+          {
+            "$obj": "p4_four"
+          },
+          {
+            "$obj": "p4_five"
+          },
+          {
+            "$obj": "p4_six"
+          }
+        ],
+        "otherButtons": [
+          {
+            "$obj": "p4_plus"
+          },
+          {
+            "$obj": "p4_minus"
+          },
+          {
+            "$obj": "p4_submit"
+          },
+          {
+            "$obj": "p4_callIt"
+          }
+        ],
+        "numberDisplay": {
+          "$comp": "p4_number",
+          "kind": "TMP"
+        },
+        "playerNameDisplay": {
+          "$comp": "p4_name",
+          "kind": "TMP"
+        },
+        "joinUi": {
+          "$obj": "p4_join"
+        },
+        "leaveUi": {
+          "$obj": "p4_leave"
+        },
+        "startUi": {
+          "$obj": "p4_start"
+        },
+        "continueUi": {
+          "$obj": "p4_continue"
+        },
+        "preGameUi": {
+          "$obj": "p4_preGame"
+        },
+        "inGameUi": {
+          "$obj": "p4_inGame"
+        },
+        "wildIconUi": {
+          "$obj": "p4_wild"
+        },
+        "localSelectionSfx": {
+          "$clip": 0,
+          "on": "p4_speaker"
+        },
+        "altSelectionSfx": {
+          "$clip": 1,
+          "on": "p4_speaker"
+        },
+        "turnNotificationSfx": {
+          "$clip": 2,
+          "on": "p4_speaker"
+        },
+        "speaker": {
+          "$comp": "p4_speaker",
+          "kind": "AudioSource"
+        },
+        "diceMaster": {
+          "$beh": "master"
+        }
+      }
+    },
+    {
+      "id": "prox",
+      "type": "ProximityEnable",
+      "object": "proximity",
+      "fields": {
+        "objectToToggle": null,
+        "canvases": [
+          {
+            "$obj": "billboard"
+          },
+          {
+            "$obj": "menu"
+          },
+          {
+            "$obj": "p1_canvas"
+          },
+          {
+            "$obj": "p2_canvas"
+          },
+          {
+            "$obj": "p3_canvas"
+          },
+          {
+            "$obj": "p4_canvas"
+          }
+        ]
+      }
+    },
+    {
+      "id": "p1_join_ft",
+      "type": "FingerTrigger",
+      "object": "p1_join_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p1"
+        },
+        "methodName": "_Join",
+        "pushInMethod": "_DepressedClickSoundAll",
+        "anim": {
+          "$comp": "p1",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p1_leave_ft",
+      "type": "FingerTrigger",
+      "object": "p1_leave_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p1"
+        },
+        "methodName": "_Leave",
+        "pushInMethod": "_DepressedClickSoundOwner",
+        "anim": {
+          "$comp": "p1",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p1_start_ft",
+      "type": "FingerTrigger",
+      "object": "p1_start_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p1"
+        },
+        "methodName": "_StartGame",
+        "pushInMethod": "_DepressedClickSoundOwner",
+        "anim": {
+          "$comp": "p1",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p1_continue_ft",
+      "type": "FingerTrigger",
+      "object": "p1_continue_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p1"
+        },
+        "methodName": "_ContinueGame",
+        "pushInMethod": "_DepressedClickSoundOwner",
+        "anim": {
+          "$comp": "p1",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p1_rules_ft",
+      "type": "FingerTrigger",
+      "object": "p1_rules_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p1"
+        },
+        "methodName": "_Rules",
+        "pushInMethod": "_DepressedClickSoundAll",
+        "anim": {
+          "$comp": "p1",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p1_submit_ft",
+      "type": "FingerTrigger",
+      "object": "p1_submit_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p1"
+        },
+        "methodName": "_Submit",
+        "pushInMethod": "_DepressedClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p1",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p1_callIt_ft",
+      "type": "FingerTrigger",
+      "object": "p1_callIt_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p1"
+        },
+        "methodName": "_Contest",
+        "pushInMethod": "_DepressedClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p1",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p1_one_ft",
+      "type": "FingerTrigger",
+      "object": "p1_one_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p1"
+        },
+        "methodName": "_ChooseOne",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p1",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p1_two_ft",
+      "type": "FingerTrigger",
+      "object": "p1_two_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p1"
+        },
+        "methodName": "_ChooseTwo",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p1",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p1_three_ft",
+      "type": "FingerTrigger",
+      "object": "p1_three_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p1"
+        },
+        "methodName": "_ChooseThree",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p1",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p1_four_ft",
+      "type": "FingerTrigger",
+      "object": "p1_four_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p1"
+        },
+        "methodName": "_ChooseFour",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p1",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p1_five_ft",
+      "type": "FingerTrigger",
+      "object": "p1_five_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p1"
+        },
+        "methodName": "_ChooseFive",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p1",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p1_six_ft",
+      "type": "FingerTrigger",
+      "object": "p1_six_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p1"
+        },
+        "methodName": "_ChooseSix",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p1",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p1_plus_ft",
+      "type": "FingerTrigger",
+      "object": "p1_plus_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p1"
+        },
+        "methodName": "_Add",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p1",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p1_minus_ft",
+      "type": "FingerTrigger",
+      "object": "p1_minus_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p1"
+        },
+        "methodName": "_Subtract",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p1",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p2_join_ft",
+      "type": "FingerTrigger",
+      "object": "p2_join_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p2"
+        },
+        "methodName": "_Join",
+        "pushInMethod": "_DepressedClickSoundAll",
+        "anim": {
+          "$comp": "p2",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p2_leave_ft",
+      "type": "FingerTrigger",
+      "object": "p2_leave_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p2"
+        },
+        "methodName": "_Leave",
+        "pushInMethod": "_DepressedClickSoundOwner",
+        "anim": {
+          "$comp": "p2",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p2_start_ft",
+      "type": "FingerTrigger",
+      "object": "p2_start_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p2"
+        },
+        "methodName": "_StartGame",
+        "pushInMethod": "_DepressedClickSoundOwner",
+        "anim": {
+          "$comp": "p2",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p2_continue_ft",
+      "type": "FingerTrigger",
+      "object": "p2_continue_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p2"
+        },
+        "methodName": "_ContinueGame",
+        "pushInMethod": "_DepressedClickSoundOwner",
+        "anim": {
+          "$comp": "p2",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p2_rules_ft",
+      "type": "FingerTrigger",
+      "object": "p2_rules_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p2"
+        },
+        "methodName": "_Rules",
+        "pushInMethod": "_DepressedClickSoundAll",
+        "anim": {
+          "$comp": "p2",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p2_submit_ft",
+      "type": "FingerTrigger",
+      "object": "p2_submit_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p2"
+        },
+        "methodName": "_Submit",
+        "pushInMethod": "_DepressedClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p2",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p2_callIt_ft",
+      "type": "FingerTrigger",
+      "object": "p2_callIt_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p2"
+        },
+        "methodName": "_Contest",
+        "pushInMethod": "_DepressedClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p2",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p2_one_ft",
+      "type": "FingerTrigger",
+      "object": "p2_one_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p2"
+        },
+        "methodName": "_ChooseOne",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p2",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p2_two_ft",
+      "type": "FingerTrigger",
+      "object": "p2_two_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p2"
+        },
+        "methodName": "_ChooseTwo",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p2",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p2_three_ft",
+      "type": "FingerTrigger",
+      "object": "p2_three_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p2"
+        },
+        "methodName": "_ChooseThree",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p2",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p2_four_ft",
+      "type": "FingerTrigger",
+      "object": "p2_four_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p2"
+        },
+        "methodName": "_ChooseFour",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p2",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p2_five_ft",
+      "type": "FingerTrigger",
+      "object": "p2_five_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p2"
+        },
+        "methodName": "_ChooseFive",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p2",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p2_six_ft",
+      "type": "FingerTrigger",
+      "object": "p2_six_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p2"
+        },
+        "methodName": "_ChooseSix",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p2",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p2_plus_ft",
+      "type": "FingerTrigger",
+      "object": "p2_plus_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p2"
+        },
+        "methodName": "_Add",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p2",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p2_minus_ft",
+      "type": "FingerTrigger",
+      "object": "p2_minus_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p2"
+        },
+        "methodName": "_Subtract",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p2",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p3_join_ft",
+      "type": "FingerTrigger",
+      "object": "p3_join_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p3"
+        },
+        "methodName": "_Join",
+        "pushInMethod": "_DepressedClickSoundAll",
+        "anim": {
+          "$comp": "p3",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p3_leave_ft",
+      "type": "FingerTrigger",
+      "object": "p3_leave_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p3"
+        },
+        "methodName": "_Leave",
+        "pushInMethod": "_DepressedClickSoundOwner",
+        "anim": {
+          "$comp": "p3",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p3_start_ft",
+      "type": "FingerTrigger",
+      "object": "p3_start_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p3"
+        },
+        "methodName": "_StartGame",
+        "pushInMethod": "_DepressedClickSoundOwner",
+        "anim": {
+          "$comp": "p3",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p3_continue_ft",
+      "type": "FingerTrigger",
+      "object": "p3_continue_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p3"
+        },
+        "methodName": "_ContinueGame",
+        "pushInMethod": "_DepressedClickSoundOwner",
+        "anim": {
+          "$comp": "p3",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p3_rules_ft",
+      "type": "FingerTrigger",
+      "object": "p3_rules_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p3"
+        },
+        "methodName": "_Rules",
+        "pushInMethod": "_DepressedClickSoundAll",
+        "anim": {
+          "$comp": "p3",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p3_submit_ft",
+      "type": "FingerTrigger",
+      "object": "p3_submit_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p3"
+        },
+        "methodName": "_Submit",
+        "pushInMethod": "_DepressedClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p3",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p3_callIt_ft",
+      "type": "FingerTrigger",
+      "object": "p3_callIt_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p3"
+        },
+        "methodName": "_Contest",
+        "pushInMethod": "_DepressedClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p3",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p3_one_ft",
+      "type": "FingerTrigger",
+      "object": "p3_one_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p3"
+        },
+        "methodName": "_ChooseOne",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p3",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p3_two_ft",
+      "type": "FingerTrigger",
+      "object": "p3_two_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p3"
+        },
+        "methodName": "_ChooseTwo",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p3",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p3_three_ft",
+      "type": "FingerTrigger",
+      "object": "p3_three_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p3"
+        },
+        "methodName": "_ChooseThree",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p3",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p3_four_ft",
+      "type": "FingerTrigger",
+      "object": "p3_four_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p3"
+        },
+        "methodName": "_ChooseFour",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p3",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p3_five_ft",
+      "type": "FingerTrigger",
+      "object": "p3_five_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p3"
+        },
+        "methodName": "_ChooseFive",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p3",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p3_six_ft",
+      "type": "FingerTrigger",
+      "object": "p3_six_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p3"
+        },
+        "methodName": "_ChooseSix",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p3",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p3_plus_ft",
+      "type": "FingerTrigger",
+      "object": "p3_plus_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p3"
+        },
+        "methodName": "_Add",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p3",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p3_minus_ft",
+      "type": "FingerTrigger",
+      "object": "p3_minus_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p3"
+        },
+        "methodName": "_Subtract",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p3",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p4_join_ft",
+      "type": "FingerTrigger",
+      "object": "p4_join_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p4"
+        },
+        "methodName": "_Join",
+        "pushInMethod": "_DepressedClickSoundAll",
+        "anim": {
+          "$comp": "p4",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p4_leave_ft",
+      "type": "FingerTrigger",
+      "object": "p4_leave_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p4"
+        },
+        "methodName": "_Leave",
+        "pushInMethod": "_DepressedClickSoundOwner",
+        "anim": {
+          "$comp": "p4",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p4_start_ft",
+      "type": "FingerTrigger",
+      "object": "p4_start_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p4"
+        },
+        "methodName": "_StartGame",
+        "pushInMethod": "_DepressedClickSoundOwner",
+        "anim": {
+          "$comp": "p4",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p4_continue_ft",
+      "type": "FingerTrigger",
+      "object": "p4_continue_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p4"
+        },
+        "methodName": "_ContinueGame",
+        "pushInMethod": "_DepressedClickSoundOwner",
+        "anim": {
+          "$comp": "p4",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p4_rules_ft",
+      "type": "FingerTrigger",
+      "object": "p4_rules_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p4"
+        },
+        "methodName": "_Rules",
+        "pushInMethod": "_DepressedClickSoundAll",
+        "anim": {
+          "$comp": "p4",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p4_submit_ft",
+      "type": "FingerTrigger",
+      "object": "p4_submit_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p4"
+        },
+        "methodName": "_Submit",
+        "pushInMethod": "_DepressedClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p4",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p4_callIt_ft",
+      "type": "FingerTrigger",
+      "object": "p4_callIt_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p4"
+        },
+        "methodName": "_Contest",
+        "pushInMethod": "_DepressedClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p4",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p4_one_ft",
+      "type": "FingerTrigger",
+      "object": "p4_one_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p4"
+        },
+        "methodName": "_ChooseOne",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p4",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p4_two_ft",
+      "type": "FingerTrigger",
+      "object": "p4_two_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p4"
+        },
+        "methodName": "_ChooseTwo",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p4",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p4_three_ft",
+      "type": "FingerTrigger",
+      "object": "p4_three_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p4"
+        },
+        "methodName": "_ChooseThree",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p4",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p4_four_ft",
+      "type": "FingerTrigger",
+      "object": "p4_four_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p4"
+        },
+        "methodName": "_ChooseFour",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p4",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p4_five_ft",
+      "type": "FingerTrigger",
+      "object": "p4_five_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p4"
+        },
+        "methodName": "_ChooseFive",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p4",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p4_six_ft",
+      "type": "FingerTrigger",
+      "object": "p4_six_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p4"
+        },
+        "methodName": "_ChooseSix",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p4",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p4_plus_ft",
+      "type": "FingerTrigger",
+      "object": "p4_plus_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p4"
+        },
+        "methodName": "_Add",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p4",
+          "kind": "Animator"
+        }
+      }
+    },
+    {
+      "id": "p4_minus_ft",
+      "type": "FingerTrigger",
+      "object": "p4_minus_sel",
+      "fields": {
+        "behavior": {
+          "$beh": "p4"
+        },
+        "methodName": "_Subtract",
+        "pushInMethod": "_DepressedAltClickSoundOwnerTurn",
+        "anim": {
+          "$comp": "p4",
+          "kind": "Animator"
+        }
+      }
+    }
+  ],
+  "events": [
+    {
+      "object": "onesWildButton",
+      "kind": "click",
+      "behaviour": "master",
+      "method": "_OnesWild"
+    },
+    {
+      "object": "soundButton",
+      "kind": "click",
+      "behaviour": "master",
+      "method": "_ToggleAudio"
+    },
+    {
+      "object": "leaveGameButton",
+      "kind": "click",
+      "behaviour": "master",
+      "method": "_LeaveGame"
+    },
+    {
+      "object": "volumeSlider",
+      "kind": "uiSlider",
+      "behaviour": "master",
+      "method": "_SetVolume"
+    }
+  ]
+}

@@ -1,11 +1,17 @@
 # Liar's dice: port analysis
 
-Status: analysis only, written 2026-11-24. Nothing here was built or run. The upstream C# was read, not
-compiled; the prefabs, materials, controller and clips were read as YAML (scripts matched by the GUID in
-their `.meta` files); the two FBX files and the audio and image headers were parsed for names and sizes.
-Unity was not opened. Port-side names follow `portkit/README.md` (protocol `pk1`). `portkit/ts` does not
-exist yet, so runtime calls are named as the README names them and anything the README does not list is
-marked as an addition.
+Status (2026-11-24, second pass): **the rules are ported and pass rung 1.** `altspace/ts/` holds the
+TypeScript translation on the portkit runtime (one `src/<UpstreamFile>.ts` per upstream gameplay file), golden
+vectors made by compiling the upstream C# unchanged with dotnet 8 (`ts/golden/`), and multi-client scenarios
+on the fake room (`ts/test/`): `npm test` runs 17 tests, all passing; `npm run build` bundles
+`pk-liars-dice.js` (358 KB). No Unity work yet: `ts/bindings.json` is provisional (section 7), and the kit,
+bundles and Play-mode rungs are still to do. What was decided and what the runtime lacks: section 2a and
+section 10. The first pass (analysis) follows unchanged except where marked.
+
+First pass: analysis only, written 2026-11-24. The upstream C# was read, not compiled; the prefabs, materials,
+controller and clips were read as YAML (scripts matched by the GUID in their `.meta` files); the two FBX files
+and the audio and image headers were parsed for names and sizes. Unity was not opened. Port-side names follow
+`portkit/README.md` (protocol `pk1`).
 
 Reference shorthand (`M:205-218` means lines 205 to 218 of that file):
 
@@ -187,6 +193,73 @@ Each line is a statement a test can check. "Local" means only the player who did
 
 ---
 
+## 2a. Checklist status of the TypeScript rules (2026-11-24)
+
+Done: the rule works as upstream and a test or vector shows it. Changed: it works, differently, for the reason
+given. Left out: not ported. Kit: belongs to the Unity kit, not to the rules. Tests are in `ts/test/`:
+`golden.test.ts` (V1 to V5 against the upstream C#) and `scenarios.test.ts` (S1 to S11, in file order: full
+game; challenge true and false; ones wild; leaving; late joiner; referee leaves; cheating client; no reveal / no
+roll; two Joins; two tables; rules button and budget).
+
+**Totals: 50 done, 10 changed, 2 left out, 1 kit (F01 to F63); D01 to D16: 12 fixed, 1 kept as upstream, 3 gone or not carried over.**
+
+| # | Status | Evidence or note |
+|---|---|---|
+| F01, F02 | Done | Four `PlayerHandle`s, 20 dice in station order (`bindings.json`, provisional) |
+| F03, F04 | Done | Field defaults; empty seat draws frame 8 (`DieFrames`); S4 |
+| F05, F06 | Done | Referee refuses a taken seat and a second seat: S9 |
+| F07 | Done | Join hidden and refused during a game: S5 |
+| F08 | Changed | Same rule (square root per channel, one hex digit doubled) on an FNV-1a hash; upstream's `string.GetHashCode()` cannot be reproduced, so colours differ from VRChat's (Q10). Name tested for stability and shape |
+| F09, F10, F11 | Done | S4, S1; Start hidden again below two seated (D08) |
+| F12 | Done | S1: station 1 opens |
+| F13 | Changed | Each player's dice are a fair self-roll (section 3a as built); each face 0 to 5 from SHA-256, 48 bits mod 6 |
+| F14 | Changed | Large or small roll by dice in play, as upstream; the random pitch is computed but cannot reach the app (runtime gap G1) |
+| F15 | Done | S1 checks, every round, that each page shows its own faces and "?" for everyone else, and cannot compute anyone else's draw |
+| F16, F17 | Done | V5 (3,000 displays against `UpdateText`) |
+| F18, F19, F20, F21 | Done | V3 (10,000 panels against `HighLightButton` and `_Submit`); colours through `uiColor`; the referee re-checks every bid |
+| F22, F23 | Done | V3; S1, S2 |
+| F24 | Done | V1 (against `ReturnNextUser`), with the empty-seat fix |
+| F25 | Done | Chime on the local owner's page when their turn starts |
+| F26 | Done | Panel checks the local owner; the referee checks the caller of every command |
+| F27 | Changed | 0.5 s lockout instead of 30 frames (a runtime frame is a 50 ms tick, so 30 would be 1.5 s) |
+| F28 | Done | Wild icon follows `onesWild && !onesInvalid`: S3 |
+| F29, F30, F31, F32 | Done | S3 (toggle in the lobby reaches everyone; wild on makes a bid true that is false with it off; a bid on ones strikes the line and stops ones counting; wild again next round); V2 |
+| F33 | Changed | Dice are shown once the reveals are checked (revealing phase), then tinted as upstream: S1, S2 |
+| F34 | Done | V2 (3,000 tables against `CalcSumShowDice`) |
+| F35, F36, F37 | Done | V4 (3,000 challenges against `_PlayerContests`, state and text); boo and cheer on every page: S1 |
+| F38 | Done | Continue for everyone seated at the challenge, eliminated players included; only in the result phase (D06): S2 |
+| F39, F40 | Done | S2 (loser opens; challenger opens after losing), V4 |
+| F41, F42 | Done | S1: "<name> is the Winner", applause, seats empty, Join everywhere |
+| F43, F44, F45, F46, F47 | Done | S4 |
+| F48 | Done | Menu buttons bound as click events, slider as `uiSlider`; the credit line's text is kit work |
+| F49 | Changed | Volume is kept per page but cannot reach the app (gap G1) |
+| F50, F51 | Done | Local; S11 for the rules line |
+| F52 | Changed | Click sounds play; their pitches cannot reach the app (gap G1) |
+| F53 | Done | Through the table speaker's clip list (`$clip` with `on`; gap G3 until the `audio` op exists) |
+| F54 | Done | Every button is its selector's click |
+| F55 | Changed | Point and click (coordinator decision): animator bool pulsed 0.15 s, push-in sound, both hands buzz |
+| F56, F57 | Left out | No finger bones on the page; `PositionTracker.ts` is an empty class |
+| F58 | Changed | Distance from the head to the table centre on the tick (`ui-range`, default 3.5 m), canvases switched; on while the position is unknown |
+| F59 | Kit | Billboard component on the centre display |
+| F60, F61, F62 | Done | Digests agree after every step; S5; S6 |
+| F63 | Changed | `debug="true"` logs to the console; the log panel is left out |
+| D01 | Fixed | Result is state: S5 (late arrival sees the result text and dice) |
+| D02 | Fixed | Panels drawn from state |
+| D03 | Gone | No finger pressing |
+| D04 | Fixed | Lobby departure frees the seat only: S4 |
+| D05 | Fixed | `returnNextUser` moves past an empty seat: V1 (1,792 patterns where upstream lands on no playable seat) |
+| D06 | Fixed | Continue only in the result phase: S2 (two presses in one tick start one round) |
+| D07, D08, D09 | Fixed | Dice in play counted before the panels; Start hidden below two; check mark not flipped during a game |
+| D10 | Kept | The bidder is still "the previous taken seat" (Q4, rules kept literal) |
+| D11 | Fixed | Names in state |
+| D12 | Fixed | Round fields synced; S6 (referee leaves mid-bidding, then the next referee leaves mid-reveal) |
+| D13 | Fixed | Counts reset at game end: S1 |
+| D14 | Fixed | Commands are numbered and run once by the referee; no sound from a snapshot: S5 |
+| D15 | Gone | Pitch does not reach the app at all yet (G1) |
+| D16 | Not carried over | |
+
+---
+
 ## 3. State and messages (upstream)
 
 ### Synced variables
@@ -257,6 +330,21 @@ itself from its own copy of `dieValues`.
 ---
 
 ## 3a. Design change in detail: each player rolls and commits
+
+**As built (2026-11-24).** The coordinator chose the seeded roll (Q1): each player's dice are a **fair
+self-roll** through the runtime's `Secrets` fair draw, not a commitment to dice the player picked. Per round
+(label `<gameId>.<round>`): every seated page calls `beginDraw(label)` (publishes SHA-256 of a 16-byte secret in
+its own user state); the referee answers each commitment with a random number and pins the hash it answered (the
+`fd` table); the dice are `Draw(secret, number, label).Ints(remaining, 6)`, so the player knows them at once and
+nobody else does, and nobody can pick them. On "Call it" the referee calls `demandReveal(label, reveal-timeout)`
+and every page seated at the challenge calls `revealDraw(label)`; the referee counts only draws whose state is
+`revealed` (secret matches the pinned hash). A secret changed after the number is `rejected`; no reveal by the
+deadline is `forfeit`; both put the player in `missing`, with the forfeit rules of step 7 below. Bidding opens
+when every seated player's draw is numbered; a player still without a number at `commit-timeout` is removed as
+if they had left. What differs from the proposal below: no hand-made hash string, salt or `c`/`o` leaves (the
+runtime's `fd`/`fr` user-state entries and `fd` table do that); no `taskAck` (the runtime's numbered commands
+do that); a reload is not resumed (N12), because the draw secret lives in page memory and a reload is a new
+session (gap G6). Every client repeats the count from the reveals it sees (`integrityOk`, checked in S1).
 
 **Why.** Upstream sends every die to every client (`M:29`) and hides them by drawing "?" (`M:781`). Ported
 as is, all 20 values would sit in public space state where any player can read them from the page console.
@@ -635,6 +723,24 @@ Third-party items and licences: the table in section 1.
 
 ## 7. Translation map
 
+**`ts/bindings.json` is provisional** (written 2026-11-24 from the object model of section 5, before any kit
+build). The kit builder (`LiarsDiceKitBuilder`) will write the real one; until then these are the object keys and
+paths it is expected to export, relative to the kit root: `display`, `rules`, `billboard`, `master`, `speaker`
+(the table's AudioSource, clip list yay 0, boo 1, roll small 2, roll large 3, applause 4), `proximity`, `menu`,
+`onesWildButton`, `onesWildCheck`, `volumeSlider`, `soundButton`, `soundCheck`, `leaveGameButton`; per station
+`p1`..`p4` (`master script/pN`, with its Animator): `pN_die0`..`4`, `pN_canvas`, `pN_name`, `pN_preGame`,
+`pN_join`, `pN_leave`, `pN_start`, `pN_inGame`, `pN_one`..`pN_six`, `pN_wild` (assumed name of the wild image
+under `one`), `pN_plus`, `pN_minus`, `pN_number`, `pN_submit`, `pN_callIt`, `pN_continue`, `pN_rules`,
+`pN_speaker` (clip list click-01 0, click w-pitch 1, chime 2), and the 15 click targets `pN_<button>_sel`
+(`<button path>/selector`). 185 objects, 120 refs, 66 behaviours (master, four stations, `prox`, 60
+FingerTriggers), 4 events. Every object is `sync: "none"`: the game uses no networked objects. A key the
+builder names differently only needs the tests' helper names changed.
+
+As built: `LiarsDiceMaster.ts` (1,144 lines, with the pure rule functions the vectors call:
+`returnNextUser`, `returnLastPlayer`, `calcSumShowDice`, `playerContests`, `bidAccepted`), `PlayerHandle.ts`
+(`highlightColors`, the `Task` command), `ProximityEnable.ts`, `FingerTrigger.ts`, `PositionTracker.ts` (empty),
+and `gaps.ts` for the local stand-ins of section 10.
+
 In porting order. TypeScript line estimates are mine.
 
 | # | Upstream | To | Lines | Hard parts |
@@ -785,6 +891,37 @@ played alternately with the first. Ones-wild toggled on one page shows on the ot
 
 ## 10. Changed or left out, then risks and questions
 
+### Decisions recorded (coordinator, 2026-11-24)
+
+- Each player's dice are a **fair self-roll**: commit to a secret, the referee publishes a number, the dice come
+  from both (the runtime's `Draw`); reveal on a challenge; a player who does not reveal by `reveal-timeout`
+  forfeits (out of the game, nobody else loses a die), and so does one whose reveal does not match. Closes Q1.
+- **Fixed on purpose, listed as deliberate differences:** `remaining[-1]` when a lobby player leaves (D04);
+  a second Continue skipping a turn (D06); the turn landing on an empty seat (D05, and `ReturnNextUser` in
+  general: V1 shows the 1,792 seat patterns where upstream returns no playable seat or throws).
+- **Point and click** replaces fingertip pushing (F55 to F57).
+- **Every other rule literal.** In particular D10 stays: the bidder judged in a challenge is the previous
+  taken seat (Q4 answered "keep").
+- Referee rule: `"anyone"` (the runtime default), not `"declared"`. In this game the referee never learns
+  anyone's dice before the reveal (its numbers are public), so a bystander referee is handed no secret; a
+  client is a candidate only after its kit has loaded (it announces after `loadKit`), which covers Q8.
+
+### Runtime gaps found while porting the rules
+
+Local workarounds live in `ts/src/gaps.ts` and in the game's own files; nothing under `portkit/` was changed.
+
+| # | Gap | Effect here | Workaround |
+|---|---|---|---|
+| G1 | No relay op or `AudioSourceRef` member for an audio source's **pitch or volume** | Roll pitch (F14), click pitches (F52), the volume slider (F49) do not reach the app | `Speaker` in `gaps.ts` records pitch and volume (tests read them) and plays with `PlayOneShot`. Needs an `audioPitch` / `audioVolume` op |
+| G2 | `Color` has no `cyan`, `gray` or `HSVToRGB` | | `Cyan`, `Gray`, `HSVToRGB` (Unity's formula) in `gaps.ts` |
+| G3 | The `audio` relay op (`$clip` with `on`) is "asked for, not built yet" in the README | No table or station sound in the app until it is | None needed in TypeScript |
+| G4 | A game cannot send its own relay op from TypeScript: `RelayHost.value`/`event` are private and `HostActions` has fixed members, although the README lets a kit builder add ops | G1 could not be worked around with a game op | None |
+| G5 | The fair-draw table `fd` is **public** space state, which the README's own Trust rule says any client can write; `Secrets` does not check who wrote it | A modified client could overwrite another player's pinned hash or number, making an honest reveal look `rejected` (forfeit), or replace its own entry | None in the game. Suggest the table move to protected state or the referee's user state, or each client keep the first pin it saw per label (as section 3a proposed) |
+| G6 | A draw belongs to a session id, and the secret is kept only in page memory | A reload mid-round loses the player's dice; they are removed at the next deadline as if they had left (Q5, N12 not possible) | None |
+| G7 | A `click` event carries no hand | FingerTrigger buzzes both controllers | Both hands |
+| G8 | Under `referee: "declared"`, a player's departure is delivered at once even with no referee, so a master-guarded `OnPlayerLeft` can be lost | Not hit here (the game uses `"anyone"`) | `LiarsDiceMaster.Reconcile()` frees a seat whose player has been gone 3 s anyway |
+| G9 | `SendCustomEventDelayedFrames` counts 50 ms ticks | 30 frames would be 1.5 s | Seconds (0.5 s) |
+
 ### Changed
 
 | What | Reason |
@@ -816,10 +953,10 @@ played alternately with the first. Ones-wild toggled on one page shows on the ot
 
 | # | Risk or question | What decides it |
 |---|---|---|
-| Q1 | **A modified page can choose its own dice.** The plan's scheme stops peeking and changing, not choosing; upstream did not let players choose. The seeded roll in section 3a closes it for about 60 lines and one more message per player per round | Lead: ship the plan's scheme, or the seeded one |
+| Q1 | **Closed 2026-11-24: fair self-roll through the runtime's `Draw` (section 3a, as built).** Was: **A modified page can choose its own dice.** The plan's scheme stops peeking and changing, not choosing; upstream did not let players choose. The seeded roll in section 3a closes it for about 60 lines and one more message per player per round | Lead: ship the plan's scheme, or the seeded one |
 | Q2 | **Heavitas is not MIT.** Shipping it, its two atlases or the frame-8 lettering needs a licence nobody here holds. `dice roll large.wav` needs a CC BY 4.0 credit. Both readings came through an automated page fetch | A person reads the dafont and freesound pages once; then replace the font |
-| Q3 | **README additions this game needs:** `OnPlayerLeft` on `Behaviour`; `Networking.GetOwner`; a rule that an unowned behaviour belongs to the referee; no `OnDeserialization` echo to the writer and a way to tell a snapshot from a change; relay ops for a material float (or the alpha trick) and a UI graphic colour; a slider event; where `commit()` publishes (this design wants user state). Hashing through WebCrypto is asynchronous, which does not fit rule code translated line for line; a small synchronous SHA-256 in the runtime would | Pathfinder and README owner |
-| Q4 | D10: keep "the bidder is the previous taken seat" or record who actually bid? Recording is one field and changes the outcome only after a mid-round leave | Lead |
+| Q3 | **Mostly answered by the runtime 2026-11-24** (`OnPlayerLeft`, `GetOwner`, unowned behaviours belong to the referee, `isSnapshot`, `matFloat`, `uiColor`, `uiSlider`, synchronous SHA-256, draws in user state); still open: gaps G1, G4, G5 above. Was: **README additions this game needs:** `OnPlayerLeft` on `Behaviour`; `Networking.GetOwner`; a rule that an unowned behaviour belongs to the referee; no `OnDeserialization` echo to the writer and a way to tell a snapshot from a change; relay ops for a material float (or the alpha trick) and a UI graphic colour; a slider event; where `commit()` publishes (this design wants user state). Hashing through WebCrypto is asynchronous, which does not fit rule code translated line for line; a small synchronous SHA-256 in the runtime would | Pathfinder and README owner |
+| Q4 | **Kept as upstream (2026-11-24).** D10: keep "the bidder is the previous taken seat" or record who actually bid? Recording is one field and changes the outcome only after a mid-round leave | Lead |
 | Q5 | What counts as leaving? Upstream: leaving the world, at once. On the relay a sleeping headset or a page reload may show as a leave and remove the player from the game. A grace period would be a rule change. Whether a resumed session raises `user-left` at all is not known | Spike on the relay; lead |
 | Q6 | Unity UI inside a kit: do Buttons and the Slider receive the app's pointer, or only colliders with `click`? The design uses colliders for buttons either way; the slider has no fallback but step buttons | Spike S6 |
 | Q7 | Panels are 25 cm with 4 cm buttons, made for fingers. Whether they are comfortable to hit with a laser from a standing position is unknown until someone tries; `scale` helps only by enlarging the whole table | Play mode, then headset |
