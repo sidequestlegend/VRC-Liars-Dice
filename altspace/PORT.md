@@ -747,7 +747,7 @@ The Kenney packs were taken from OpenGameArt, where Kenney published them: kenne
 donation page whose download link this session was not allowed to follow automatically.
 
 Textures as imported: table albedo and normal 1024 (Windows) / 512 (Android, ASTC 6x6), metallic 256, dice atlas 1024 /
-512, face sprites 128, button 256 / 128, wild icon 128. Bundles: Android 1,865 KiB, Windows 3,699 KiB.
+512, face sprites 128, button 256 / 128, wild icon 128. Bundles: Android 1,867 KiB, Windows 3,695 KiB.
 
 ---
 
@@ -1024,6 +1024,13 @@ does the same from the imported prefab (never compiling upstream C#), then:
 
 New snippet settings: `rejoin-grace` (20 s; the seat is held for a reloading player during a game) and `min-players`
 (2; 1 lets one person practise and is what the one-player Play-mode test uses).
+
+### Rungs (evidence in `TESTS.md`)
+
+Rung 0/1: `npm test` 21 of 21 (typecheck, lint, golden vectors V1 to V5, 16 scenarios). Rung 2: `PortKit/Kit/Check` PASS
+(0 disallowed graph nodes, 187 bindings resolve, Android 1,867 KiB and Windows 3,695 KiB bundles PASS BundleChecker) and
+`PortKit/Liars Dice/Check Licences` PASS. Rung 3: 22 of 22 in Play mode. Rung 4: 39 of 39 with two Local Multiplayer
+players, reload included. Artifacts exported to `altspace/dist/`.
 
 ### Checklist after the kit
 
