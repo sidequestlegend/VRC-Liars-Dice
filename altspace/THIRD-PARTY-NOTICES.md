@@ -20,8 +20,13 @@ https://github.com/akalink/VRC-Liars-Dice, under the MIT licence:
 > COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 > OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Port source: https://github.com/sidequestlegend/VRC-Liars-Dice (branch `altspace`). The script also bundles the portkit
-runtime (MIT). Not affiliated with VRChat.
+(Full text: `Licenses/VRC-Liars-Dice-MIT.txt`.) Port source: https://github.com/sidequestlegend/VRC-Liars-Dice (branch
+`altspace`). The script also bundles the portkit runtime (MIT; its notice is the banner at the top of the script). Not
+affiliated with VRChat.
+
+Full licence texts are packed beside this file in `Licenses/`: `VRC-Liars-Dice-MIT.txt`, `CC-BY-4.0.txt`, `CC0-1.0.txt`,
+`Kenney-Interface-Sounds-License.txt`, `Kenney-Jingles-License.txt`, `ArchivoBlack-OFL.txt`; the kit tools add TextMesh
+Pro's `LiberationSans - OFL.txt` for Liberation Sans.
 
 ## What the kit holds from upstream (MIT, as above)
 
@@ -40,14 +45,18 @@ were drawn again in Archivo Black for this port.
 | `jingles_SAX01.ogg`, `jingles_SAX02.ogg` | a lie found, a true bid | "85 short music jingles" by Kenney, https://opengameart.org/content/85-short-music-jingles | CC0 1.0 | imported as mono |
 
 The licence of each freesound sound was read on its freesound.org page on 2026-11-24; the Kenney packs carry their CC0
-licence files (`Audio/Kenney-*-License.txt`).
+licence files (`Licenses/Kenney-*-License.txt`). Licence texts: `Licenses/CC-BY-4.0.txt` and `Licenses/CC0-1.0.txt`
+(the legal code from creativecommons.org).
 
 ## Fonts
 
 - **Archivo Black**, Copyright 2017 The Archivo Black Project Authors (https://github.com/Omnibus-Type/ArchivoBlack),
-  SIL Open Font License 1.1 (full text: `Fonts/ArchivoBlack-OFL.txt`; from Google Fonts). Every text of the kit, and the
+  SIL Open Font License 1.1 (full text: `Licenses/ArchivoBlack-OFL.txt`; from Google Fonts). Every text of the kit, and the
   lettering of the dice atlas.
-- **Liberation Sans** (TextMesh Pro's default, SIL Open Font License 1.1): the fallback for letters Archivo Black lacks.
+- **Liberation Sans**, Digitized data copyright (c) 2010 Google Corporation with Reserved Font Arimo, Tinos and Cousine;
+  Copyright (c) 2012 Red Hat, Inc. with Reserved Font Name Liberation. SIL Open Font License 1.1 (full text:
+  `LiberationSans - OFL.txt`, TextMesh Pro's copy, packed by the kit tools). TextMesh Pro's `LiberationSans SDF` atlas is
+  the fallback for letters Archivo Black lacks.
 
 ## Made for this port
 

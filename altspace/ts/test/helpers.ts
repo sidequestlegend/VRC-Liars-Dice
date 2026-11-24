@@ -51,8 +51,21 @@ export async function seatAll(world: TestWorld, players: FakeClient[], inst = "0
   await until(world, "every seat taken", () => master(world, players[0]!, inst).numJoinedPlayers === players.length);
 }
 
+/**
+ * Every page is in `phase`. For bidding, also every seated page has its own dice: the referee opens the bidding once its
+ * own copy of its number table is complete, and that table (the referee's user state) can reach a page a tick after the
+ * phase (space state) does; until then the page shows "?" on its own dice.
+ */
 export async function waitPhase(world: TestWorld, phase: number, inst = "0", maxMs = 20000): Promise<void> {
-  await until(world, `phase ${phase}`, () => world.clients.filter((c) => world.started(c, inst)).every((c) => master(world, c, inst).phase === phase), maxMs);
+  const pages = () => world.clients.filter((c) => world.started(c, inst));
+  await until(world, `phase ${phase}`, () => pages().every((c) => master(world, c, inst).phase === phase && !(phase === Phase.Bidding && seatedWithoutDice(world, c, inst))), maxMs);
+}
+
+/** A seated page that does not know its own dice (yet). */
+export function seatedWithoutDice(world: TestWorld, c: FakeClient, inst = "0"): boolean {
+  const m = master(world, c, inst);
+  const seat = m.currentPlayers.indexOf(world.instance(c, inst).networking.LocalPlayer.playerId);
+  return seat >= 0 && m.MyDice(seat) === null;
 }
 
 /** Seated players and their seats, from one client's view. */
@@ -128,7 +141,7 @@ export async function continueGame(world: TestWorld, c: FakeClient, inst = "0"):
   await press(world, c, seat, "continue", inst);
   await until(world, "the next round or the end", () => world.clients.filter((p) => world.started(p, inst)).every((p) => {
     const mm = master(world, p, inst);
-    return mm.phase === Phase.Bidding || mm.phase === Phase.Lobby;
+    return (mm.phase === Phase.Bidding && !seatedWithoutDice(world, p, inst)) || mm.phase === Phase.Lobby;
   }), 40000);
 }
 

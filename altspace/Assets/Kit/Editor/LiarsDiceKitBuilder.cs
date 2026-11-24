@@ -237,16 +237,11 @@ namespace LiarsDice
                 text.fontSharedMaterial = font.material;
                 text.richText = true;
             }
-            // What the page shows first. The runtime's TextRef starts as "" and sends nothing for "", so a text the game
-            // first sets to "" would keep upstream's placeholder ("MehStrongBadMeh ...", "name", "#"): blank them here.
+            // The title shows before the page has run. Upstream's placeholders in the other texts ("MehStrongBadMeh ...",
+            // "name", "#") stay in the prefab: the runtime's TextRef sends its first value even when it is "" (portkit
+            // f3eaaa1), so the page clears them itself (rung 3 checks an empty station's name display).
             Transform F(string path) => set.transform.Find(path) ?? throw new Exception($"no '{path}'");
             F("billboard display/Text (TMP)").GetComponent<TMP_Text>().text = "Liar's Dice";
-            F("billboard display/Text rules").GetComponent<TMP_Text>().text = "";
-            foreach (var p in Stations)
-            {
-                F($"master script/{p}/Canvas/name display").GetComponent<TMP_Text>().text = "";
-                F($"master script/{p}/Canvas/InGame/+&-/result").GetComponent<TMP_Text>().text = "1";
-            }
         }
 
         static void Key(KitStage stage, GameObject go, string key)
@@ -474,7 +469,8 @@ namespace LiarsDice
             "Sounds: \"dice_06.wav\" by dermotte, freesound.org/s/220744, licensed CC BY 4.0 (creativecommons.org/licenses/by/4.0), made mono. " +
             "\"Dice Rolling on Table\" by Flem0527 (freesound 629982) and \"Audience Clapping.wav\" by Zeraora (freesound 429422), CC0. " +
             "Clicks, chime and jingles: Interface Sounds and Music Jingles by Kenney (kenney.nl), CC0.\n" +
-            "Fonts: Archivo Black by Omnibus-Type, and Liberation Sans, both SIL Open Font License 1.1.\n" +
+            "Fonts: Archivo Black, Copyright 2017 The Archivo Black Project Authors; Liberation Sans, Digitized data copyright (c) 2010 " +
+            "Google Corporation, Copyright (c) 2012 Red Hat, Inc.; both SIL Open Font License 1.1. Full licence texts: the kit's Licenses folder.\n" +
             "Not affiliated with VRChat. Click to close.";
 
         // ------------------------------------------------------------------ licence check
