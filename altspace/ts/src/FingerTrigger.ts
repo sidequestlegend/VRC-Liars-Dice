@@ -4,9 +4,10 @@
 // Upstream: a VR fingertip entering the button's selector pushes it in (animator bool, push-in sound, a buzz) and
 // leaving it fires the button (F:43-75). The page has no finger bones, so a selector is a click target instead,
 // on desktop and in VR alike: a click does the push-in and, 0.15 s later, the release. The button's action runs
-// on the click itself. A click does not say which hand, so both controllers buzz (nothing on desktop).
+// on the click itself. The buzz goes to the hand the runtime judges made the click (Input.LastClickSide: the trigger
+// pulled in the last second, else the nearest hand); both hands when it cannot tell (nothing on desktop).
 
-import { Behaviour, Hand, type AnimatorRef } from "../portkit/src/index.ts";
+import { Behaviour, Hand, type AnimatorRef, type HandSide } from "../portkit/src/index.ts";
 
 export class FingerTrigger extends Behaviour {
   behavior: Behaviour | null = null;
@@ -20,7 +21,8 @@ export class FingerTrigger extends Behaviour {
     // OnTriggerEnter (F:43-58)
     this.anim?.SetBool(this.methodName, true);
     this.behavior?.SendCustomEvent(this.pushInMethod);
-    this.Buzz(0.2);
+    this.side = this.Input.LastClickSide;
+    this.Buzz(0.2, this.side);
     // OnTriggerExit (F:60-75): the action
     this.behavior?.SendCustomEvent(this.methodName);
     if (!this.held) {
@@ -32,10 +34,17 @@ export class FingerTrigger extends Behaviour {
   _Release(): void {
     this.held = false;
     this.anim?.SetBool(this.methodName, false);
-    this.Buzz(0.5);
+    this.Buzz(0.5, this.side);
   }
 
-  private Buzz(seconds: number): void {
+  /** The side of the click that pressed this button, kept for the release buzz. */
+  private side: HandSide | null = null;
+
+  private Buzz(seconds: number, side: HandSide | null = this.Input.LastClickSide): void {
+    if (side !== null) {
+      this.Input.Haptic(side, 0.5, seconds);
+      return;
+    }
     this.Input.Haptic(Hand.Left, 0.5, seconds);
     this.Input.Haptic(Hand.Right, 0.5, seconds);
   }

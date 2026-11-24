@@ -33,7 +33,6 @@ import {
   Color,
   fnv1a,
 } from "../portkit/src/index.ts";
-import { Cyan, HSVToRGB, Speaker } from "./gaps.ts";
 import type { PlayerHandle } from "./PlayerHandle.ts";
 import type { ProximityEnable } from "./ProximityEnable.ts";
 
@@ -215,6 +214,9 @@ export class LiarsDiceMaster extends Behaviour {
       Late joiners during contests will not see the correct message. (Fixed here: the result is state.)
       Nothing is initalized until table is interacted with */
 
+  /** Reached by SendCustomNetworkEvent (the runtime refuses any other name from the network). */
+  static override networkCallable = ["OnesWildNetwork", "DiceRollSound", "ResetStations", "GameEndSound"];
+
   static override synced = [
     "dieValues",
     "remaining",
@@ -250,6 +252,7 @@ export class LiarsDiceMaster extends Behaviour {
     "resultOut",
     "playerNames",
     "lastWinnerName",
+    "playerUids",
   ];
 
   // #region Instance Variables (M:27-89)
@@ -296,6 +299,11 @@ export class LiarsDiceMaster extends Behaviour {
   resultOut: boolean[] = new Array<boolean>(SEATS).fill(false);
   playerNames: string[] = new Array<string>(SEATS).fill("");
   lastWinnerName = "";
+  /**
+   * The user id of each seat's player (meaningful while the seat is taken). A page reload is a new session with a new
+   * player id: the referee gives the seat back to the same user if they return within `rejoin-grace` seconds.
+   */
+  playerUids: string[] = new Array<string>(SEATS).fill("");
 
   displayText!: TextRef;
   rulesText!: TextRef;
@@ -324,8 +332,6 @@ export class LiarsDiceMaster extends Behaviour {
   DiceRollLargeSfx: AudioClipRef | null = null;
   gameEndSfx: AudioClipRef | null = null;
   speaker: AudioSourceRef | null = null;
-  /** The table speaker, with the pitch and volume upstream sets (see gaps.ts). */
-  audio!: Speaker;
   audioState = true;
   audioStateVisual: GameObject | null = null;
   slider: GameObject | null = null;
@@ -336,6 +342,7 @@ export class LiarsDiceMaster extends Behaviour {
   private heardContest = -1;
   private commitTimeout = 15;
   private revealTimeout = 15;
+  private rejoinGrace = 20;
   private readonly absentSince = new Array<number>(SEATS).fill(-1);
   /** Each client checks the referee's result against the reveals it can see itself (PORT.md 3a, step 7). */
   integrityOk = true;
@@ -348,12 +355,12 @@ export class LiarsDiceMaster extends Behaviour {
 
   // #region initialization (M:91-125)
   override Start(): void {
-    this.audio = new Speaker(this.speaker);
     this.logging = this.Settings.get("debug") === "true";
     this.onesWild = this.Settings.get("ones-wild") !== "false";
     this.audioState = this.Settings.get("sound") !== "false";
     this.commitTimeout = numberSetting(this.Settings.get("commit-timeout"), 15);
     this.revealTimeout = numberSetting(this.Settings.get("reveal-timeout"), 15);
+    this.rejoinGrace = Math.max(0, numberSetting(this.Settings.get("rejoin-grace"), 20));
     this._ShowRules();
     for (let i = 0; i < this.currentPlayers.length; i++) {
       if (i < this.playerHandles.length) this.playerHandles[i]!._SetPlayerNumber(i); // PlayerHandle behaviors store their own index
@@ -404,7 +411,7 @@ export class LiarsDiceMaster extends Behaviour {
   /** Upstream reads slider.value (M:161-168); the slider event hands the value over. */
   _SetVolume(value: number): void {
     const v = Math.min(1, Math.max(0.025, Number(value) || 0));
-    this.audio.volume = v;
+    if (this.speaker) this.speaker.volume = v;
     for (const pH of this.playerHandles) pH._SetVolume(v);
   }
 
@@ -539,8 +546,8 @@ export class LiarsDiceMaster extends Behaviour {
 
   GameEndSound(): void {
     if (this.audioState && this.gameEndSfx !== null && this.speaker !== null) {
-      this.audio.clip = this.gameEndSfx;
-      this.audio.Play();
+      this.speaker.clip = this.gameEndSfx;
+      this.speaker.Play();
       this.sounds.push("applause");
     }
   }
@@ -699,15 +706,15 @@ export class LiarsDiceMaster extends Behaviour {
 
   DiceRollSound(): void {
     if (this.audioState && this.DiceRollSmallSfx !== null && this.DiceRollLargeSfx !== null && this.speaker !== null) {
-      this.audio.pitch = this.Random.Range(0.9, 1.1);
+      this.speaker.pitch = this.Random.Range(0.9, 1.1);
       const diceLeft = this.CountDiceLeft();
       if (diceLeft > 10) {
-        this.audio.clip = this.DiceRollLargeSfx;
-        this.audio.Play();
+        this.speaker.clip = this.DiceRollLargeSfx;
+        this.speaker.Play();
         this.sounds.push("roll large");
       } else if (diceLeft > 0) {
-        this.audio.clip = this.DiceRollSmallSfx;
-        this.audio.Play();
+        this.speaker.clip = this.DiceRollSmallSfx;
+        this.speaker.Play();
         this.sounds.push("roll small");
       }
     }
@@ -723,16 +730,16 @@ export class LiarsDiceMaster extends Behaviour {
 
   private LiarFoundSound(): void {
     if (this.audioState && this.LiarContestSfx !== null && this.speaker !== null) {
-      this.audio.clip = this.LiarContestSfx;
-      this.audio.Play();
+      this.speaker.clip = this.LiarContestSfx;
+      this.speaker.Play();
       this.sounds.push("boo");
     }
   }
 
   private TruthFoundSound(): void {
     if (this.audioState && this.TruthContestSfx !== null && this.speaker !== null) {
-      this.audio.clip = this.TruthContestSfx;
-      this.audio.Play();
+      this.speaker.clip = this.TruthContestSfx;
+      this.speaker.Play();
       this.sounds.push("cheer");
     }
   }
@@ -757,6 +764,7 @@ export class LiarsDiceMaster extends Behaviour {
       this.numJoinedPlayers++;
       this.currentPlayers[playerNum] = player.playerId;
       this.playerNames[playerNum] = player.displayName;
+      this.playerUids[playerNum] = player.uid;
       this.RequestSerialization();
       this.AllDeserialization();
     }
@@ -810,6 +818,9 @@ export class LiarsDiceMaster extends Behaviour {
   }
 
   override OnPlayerLeft(player: Player): void {
+    // During a game the seat is held for `rejoin-grace` seconds (Reconcile): a page reload comes back as a new session
+    // of the same user, whose dice the runtime restores. In the lobby a departure frees the seat at once (D04).
+    if (this.gameStarted && this.rejoinGrace > 0) return;
     this._PlayerLeft(player.playerId, true);
   }
   // #endregion
@@ -854,6 +865,7 @@ export class LiarsDiceMaster extends Behaviour {
     }
     if (this.Networking.GetServerTimeInSeconds() < this.deadline) return;
     for (const id of late) {
+      if (!this.Networking.GetPlayerById(id)) continue; // gone: Reconcile holds the seat for a reload, then frees it
       this.Log(`player ${id} did not roll in time and is removed`);
       if (this.phase === Phase.Rolling) this._PlayerLeft(id, true);
     }
@@ -867,7 +879,8 @@ export class LiarsDiceMaster extends Behaviour {
       const id = this.contestPlayers[s]!;
       if (id === -1 || this.currentPlayers[s] !== id) continue;
       const player = this.Networking.GetPlayerById(id);
-      const state = player ? this.Secrets.drawOf(player.sid, label).state : "none";
+      // A player who is gone may be reloading their page: wait for them until the reveal deadline.
+      const state = player ? this.Secrets.drawOf(player.sid, label).state : this.rejoinGrace > 0 ? "committed" : "none";
       if (state === "numbered" || state === "committed") waiting = true;
     }
     if (waiting && this.Networking.GetServerTimeInSeconds() < this.deadline) return;
@@ -875,23 +888,40 @@ export class LiarsDiceMaster extends Behaviour {
   }
 
   /**
-   * A seat whose player is no longer here for a few seconds is treated as a departure. OnPlayerLeft normally
-   * does this; this catches a departure that happened while no referee was known.
+   * A seat whose player is no longer here. If the same user is back (a page reload: a new session, a new player id),
+   * the seat, and their place in a challenge, move to the new player id; the runtime gives their dice back. Otherwise
+   * the seat is freed after a few seconds in the lobby (OnPlayerLeft normally does that at once; this catches a
+   * departure that happened while no referee was known) and after `rejoin-grace` seconds in a game.
    */
   private Reconcile(): void {
     const now = this.Time.time;
     if (now < 5) return;
+    let moved = false;
     for (let s = 0; s < SEATS; s++) {
       const id = this.currentPlayers[s]!;
       if (id === -1 || this.Networking.GetPlayerById(id)) {
         this.absentSince[s] = -1;
         continue;
       }
+      const back = this.playerUids[s] ? this.Networking.GetPlayers().find((p) => p.uid === this.playerUids[s] && !this.currentPlayers.includes(p.playerId)) : undefined;
+      if (back && this.gameStarted) {
+        this.Log(`${back.displayName} is back (player ${id} is now ${back.playerId}): the seat is kept`);
+        this.currentPlayers[s] = back.playerId;
+        if (this.contestPlayers[s] === id) this.contestPlayers[s] = back.playerId;
+        this.playerNames[s] = back.displayName;
+        this.absentSince[s] = -1;
+        moved = true;
+        continue;
+      }
       if (this.absentSince[s]! < 0) this.absentSince[s] = now;
-      else if (now - this.absentSince[s]! >= 3) {
+      else if (now - this.absentSince[s]! >= (this.gameStarted ? Math.max(3, this.rejoinGrace) : 3)) {
         this.absentSince[s] = -1;
         this._PlayerLeft(id, true);
       }
+    }
+    if (moved) {
+      this.RequestSerialization();
+      this.AllDeserialization();
     }
   }
 
@@ -952,7 +982,7 @@ export class LiarsDiceMaster extends Behaviour {
     // Upstream hashes with string.GetHashCode(), whose value VRChat does not publish: FNV-1a (32-bit, signed) here.
     const hash = parseInt(fnv1a(player), 16) | 0;
     const hc = Math.abs((hash % 1000) / 1000);
-    const p = HSVToRGB(hc, 1, 1);
+    const p = Color.HSVToRGB(hc, 1, 1);
     const r = Math.floor(Math.sqrt(p.r * 255));
     const g = Math.trunc(Math.sqrt(p.g * 255));
     const b = Math.trunc(Math.sqrt(p.b * 255));
@@ -1106,7 +1136,7 @@ export class LiarsDiceMaster extends Behaviour {
     for (let i = 0; i < frames.length; i++) {
       const mesh = this.diceMesh[i];
       if (!mesh) continue;
-      mesh.SetColor(frames[i]!.cyan ? Cyan() : Color.white, "_Color");
+      mesh.SetColor(frames[i]!.cyan ? Color.cyan : Color.white, "_Color");
       mesh.SetFloat(this.materialFloatName, frames[i]!.frame);
     }
   }

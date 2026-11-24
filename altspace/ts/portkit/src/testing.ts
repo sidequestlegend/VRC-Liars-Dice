@@ -105,3 +105,6 @@ export class TestWorld {
     return out;
   }
 }
+
+export { RulesBench } from "./bench.ts";
+export type { BenchOptions } from "./bench.ts";

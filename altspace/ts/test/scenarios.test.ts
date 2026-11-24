@@ -479,3 +479,72 @@ test("the rules button cycles the rule lines locally, and the game's state fits 
   assert.ok(budget.spaceLeaves <= 10, `this game uses ${budget.spaceLeaves} space-state leaves per copy`);
   assert.ok(budget.userLeavesPerPlayer <= 6);
 });
+
+test("a seated player reloads their page mid-round: the same seat and the same dice come back, and they count at the challenge", async () => {
+  const world = newWorld(22);
+  let players = [world.join({ name: "Ann", uid: "user-a" }), world.join({ name: "Bob", uid: "user-b" }), world.join({ name: "Cat", uid: "user-c" })];
+  await settle(world);
+  await startGame(world, players);
+  await bid(world, toAct(world, players), 1, 2);
+  // Someone seated who is not the referee reloads their page while bidding goes on: a new session (and player id) of
+  // the same user, on the same device, which saved the round's draw.
+  const reloader = players.find((p) => !world.instance(p).networking.IsReferee && p !== toAct(world, players))!;
+  const seat = seatOfClient(world, reloader);
+  const dice = allDice(world, players).get(seat)!;
+  const oldId = idOf(world, reloader);
+  world.leave(reloader);
+  const rest = players.filter((p) => p !== reloader);
+  await world.run(1500);
+  assert.equal(master(world, rest[0]!).currentPlayers[seat], oldId, "the seat is held while the player may be reloading");
+  const again = world.join({ name: reloader.name, uid: reloader.uid });
+  await settle(world);
+  await until(world, "the seat moves to the reloaded page", () => rest.concat(again).every((p) => master(world, p).currentPlayers[seat] === idOf(world, again)), 30000);
+  players = players.map((p) => (p === reloader ? again : p));
+  assert.notEqual(idOf(world, again), oldId, "a reload is a new player id");
+  assert.equal(master(world, again).phase, Phase.Bidding, "the round goes on");
+  assert.deepEqual(master(world, again).MyDice(seat), dice, "the same dice come back on the reloaded page");
+  assert.deepEqual(master(world, again).DieFrames().slice(seat * 5, seat * 5 + dice.length).map((f) => f.frame), dice, "and are drawn there");
+  for (const p of rest) assert.ok(master(world, p).DieFrames().slice(seat * 5, seat * 5 + dice.length).every((f) => f.frame === FRAME_UNKNOWN), `${p.name} still sees "?"`);
+  // Play on: a bid, a challenge; the reloaded player's dice are revealed from the restored secret and counted.
+  const all = allDice(world, players);
+  assert.deepEqual(all.get(seat), dice);
+  const second = toAct(world, players);
+  await bid(world, second, 2, 2);
+  await callIt(world, toAct(world, players));
+  const r = master(world, players[0]!);
+  assert.equal(r.resultKind, 0, "everyone revealed, the reloaded player included");
+  assert.equal(r.resultSum, count(all, 2, true));
+  assert.deepEqual(r.DieFrames().slice(seat * 5, seat * 5 + dice.length).map((f) => f.frame), dice, "their dice are shown to all");
+  checkAgreement(world);
+});
+
+test("a player who leaves mid-game and does not come back loses the seat after rejoin-grace", async () => {
+  const world = newWorld(23);
+  const players = [world.join({ name: "Ann" }), world.join({ name: "Bob" }), world.join({ name: "Cat" })];
+  await settle(world);
+  await startGame(world, players);
+  const leaver = players.find((p) => !world.instance(p).networking.IsReferee && p !== toAct(world, players))!;
+  const seat = seatOfClient(world, leaver);
+  world.leave(leaver);
+  const rest = players.filter((p) => p !== leaver);
+  await world.run(15000);
+  assert.notEqual(master(world, rest[0]!).currentPlayers[seat], -1, "held for 20 s (the default)");
+  await until(world, "the seat freed", () => rest.every((p) => master(world, p).currentPlayers[seat] === -1), 15000);
+  assert.equal(master(world, rest[0]!).numJoinedPlayers, 2);
+  checkAgreement(world);
+});
+
+test("a button's buzz goes to the hand that clicked; both hands when the runtime cannot tell", async () => {
+  const world = newWorld(24);
+  const [ann] = [world.join({ name: "Ann" }), world.join({ name: "Bob" })];
+  await settle(world);
+  ann!.haptics.length = 0;
+  await press(world, ann!, 0, "rules");
+  assert.deepEqual([...new Set(ann!.haptics.map((h) => h.side))].sort(), [0, 1], "no hand known (desktop): both");
+  ann!.haptics.length = 0;
+  ann!.input({ type: "button", button: 0, side: 0, pressed: true });
+  await world.run(50);
+  await press(world, ann!, 0, "rules");
+  assert.ok(ann!.haptics.length >= 2, "push and release");
+  assert.deepEqual([...new Set(ann!.haptics.map((h) => h.side))], [0], "the left hand pulled the trigger: only the left buzzes");
+});

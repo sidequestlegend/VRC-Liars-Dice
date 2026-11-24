@@ -14,7 +14,6 @@
 //   - The station rolls and reveals its player's dice (RollOwnDice, RevealOwnDice: PORT.md section 3a).
 
 import { type AudioClipRef, type AudioSourceRef, Behaviour, Color, type GameObject, type Player, type TextRef } from "../portkit/src/index.ts";
-import { Cyan, Gray, Speaker } from "./gaps.ts";
 import type { LiarsDiceMaster } from "./LiarsDiceMaster.ts";
 
 /** Task numbers (P:24). */
@@ -64,9 +63,12 @@ export function highlightColors(
   return { faces, others };
 }
 
-const COLORS: Record<ButtonColor, () => Color> = { white: () => Color.white, cyan: Cyan, gray: Gray };
+const COLORS: Record<ButtonColor, () => Color> = { white: () => Color.white, cyan: () => Color.cyan, gray: () => Color.gray };
 
 export class PlayerHandle extends Behaviour {
+  /** Reached by SendCommand (the runtime refuses any other name from the network). */
+  static override networkCallable = ["Task"];
+
   // #region Instance Variables (P:22-73)
   private stationNum = 0;
   /** The player seated here, as the master says (upstream: the station's own owner variable). */
@@ -97,7 +99,6 @@ export class PlayerHandle extends Behaviour {
   localSelectionSfx: AudioClipRef | null = null;
   altSelectionSfx: AudioClipRef | null = null;
   turnNotificationSfx: AudioClipRef | null = null;
-  audio!: Speaker;
   private audioState = true;
   // #endregion
 
@@ -110,8 +111,10 @@ export class PlayerHandle extends Behaviour {
   readonly sounds: string[] = [];
 
   // #region Set Logic (P:79-234)
+  private startedAt = 0;
+
   override Start(): void {
-    this.audio = new Speaker(this.speaker);
+    this.startedAt = this.Time.time;
     this.NumberCalc(0);
   }
 
@@ -120,7 +123,7 @@ export class PlayerHandle extends Behaviour {
   }
 
   _SetVolume(f: number): void {
-    this.audio.volume = f;
+    if (this.speaker) this.speaker.volume = f;
   }
 
   _SetPlayerNameUI(): void {
@@ -214,10 +217,10 @@ export class PlayerHandle extends Behaviour {
   }
 
   private _LocalClickSound(f: number): void {
-    if (this.audioState && this.localSelectionSfx !== null) {
-      this.audio.pitch = f;
-      this.audio.clip = this.localSelectionSfx;
-      this.audio.Play();
+    if (this.audioState && this.localSelectionSfx !== null && this.speaker !== null) {
+      this.speaker.pitch = f;
+      this.speaker.clip = this.localSelectionSfx;
+      this.speaker.Play();
       this.sounds.push(`click ${f}`);
     }
   }
@@ -235,10 +238,10 @@ export class PlayerHandle extends Behaviour {
   }
 
   private _AltClickSound(f: number): void {
-    if (this.audioState && this.altSelectionSfx !== null) {
-      this.audio.pitch = f;
-      this.audio.clip = this.altSelectionSfx;
-      this.audio.Play();
+    if (this.audioState && this.altSelectionSfx !== null && this.speaker !== null) {
+      this.speaker.pitch = f;
+      this.speaker.clip = this.altSelectionSfx;
+      this.speaker.Play();
       this.sounds.push(`alt ${Math.round(f * 100) / 100}`);
     }
   }
@@ -253,9 +256,9 @@ export class PlayerHandle extends Behaviour {
 
   private TurnNotificationSound(): void {
     if (this.audioState && this.IsLocalOwner() && this.turnNotificationSfx !== null && this.speaker !== null) {
-      this.audio.pitch = 1;
-      this.audio.clip = this.turnNotificationSfx;
-      this.audio.Play();
+      this.speaker.pitch = 1;
+      this.speaker.clip = this.turnNotificationSfx;
+      this.speaker.Play();
       this.sounds.push("chime");
     }
   }
@@ -332,7 +335,7 @@ export class PlayerHandle extends Behaviour {
       if (this.dieNumber < 0) return;
       if (this.multiNum > this.min || this.dieNumber > this.prevDieNumber) {
         // disable button
-        this.Host.uiColor(this.otherButtons[2]!.key, Gray());
+        this.Host.uiColor(this.otherButtons[2]!.key, Color.gray);
         this.colors.others[2] = "gray";
         this.Lockout();
         this._LocalClickSound(1.1);
@@ -437,16 +440,25 @@ export class PlayerHandle extends Behaviour {
 
   // #region the station's player rolls and reveals (port, PORT.md section 3a)
 
-  /** A fair self-roll: commit to a secret now; the referee's number turns it into dice. Once per round. */
+  /**
+   * A fair self-roll: commit to a secret now; the referee's number turns it into dice. Once per round. A page that has
+   * just been reloaded first gives the runtime a moment to bring back the draw this device saved for the round.
+   */
   RollOwnDice(label: string): void {
     if (this.rolledLabel === label) return;
+    if (this.Secrets.drawOf(this.Networking.LocalPlayer.sid, label).state !== "none") {
+      this.rolledLabel = label; // already drawn (restored after a reload)
+      return;
+    }
+    if (this.Time.time - this.startedAt < 3) return;
     this.rolledLabel = label;
     this.Secrets.beginDraw(label);
   }
 
-  /** Publish the secret so everyone can check it and see the dice. Once per round. */
+  /** Publish the secret so everyone can check it and see the dice. Once per round (once the draw is known here). */
   RevealOwnDice(label: string): void {
-    if (this.revealedLabel === label || this.rolledLabel !== label) return;
+    if (this.revealedLabel === label) return;
+    if (!this.Secrets.myDraw(label)) return;
     this.revealedLabel = label;
     this.Secrets.revealDraw(label);
   }
