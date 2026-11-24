@@ -57,7 +57,7 @@ namespace LiarsDice
         public override IReadOnlyList<(string name, string value)> SnippetSettings => new[]
         {
             ("room", ""), ("ones-wild", "true"), ("sound", "true"), ("volume", "1"), ("ui-range", "3.5"),
-            ("commit-timeout", "15"), ("reveal-timeout", "15"), ("rejoin-grace", "20"), ("debug", "false"),
+            ("commit-timeout", "15"), ("reveal-timeout", "15"), ("rejoin-grace", "20"), ("min-players", "2"), ("debug", "false"),
         };
 
         GameObject set;

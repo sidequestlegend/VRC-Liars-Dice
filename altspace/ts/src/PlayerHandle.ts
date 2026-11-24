@@ -297,7 +297,7 @@ export class PlayerHandle extends Behaviour {
   }
 
   _StartGame(): void {
-    if (this.interactDelay && this.IsLocalOwner() && this.diceMaster._GetCanInteract() && this.diceMaster._GetNumJoinedPlayers() > 1) {
+    if (this.interactDelay && this.IsLocalOwner() && this.diceMaster._GetCanInteract() && this.diceMaster._GetNumJoinedPlayers() >= this.diceMaster._GetMinPlayers()) {
       if (this.yourTurn) this._LocalClickSound(1);
       this.Lockout();
       this._StartState(false);

@@ -343,6 +343,11 @@ export class LiarsDiceMaster extends Behaviour {
   private commitTimeout = 15;
   private revealTimeout = 15;
   private rejoinGrace = 20;
+  /**
+   * Port addition (`min-players`, default 2 as upstream): the fewest seated players a game starts with and goes on
+   * with. 1 allows practising alone (and the one-player Play-mode test): the turn then always comes back to that player.
+   */
+  private minPlayers = 2;
   private readonly absentSince = new Array<number>(SEATS).fill(-1);
   /** Each client checks the referee's result against the reveals it can see itself (PORT.md 3a, step 7). */
   integrityOk = true;
@@ -361,6 +366,7 @@ export class LiarsDiceMaster extends Behaviour {
     this.commitTimeout = numberSetting(this.Settings.get("commit-timeout"), 15);
     this.revealTimeout = numberSetting(this.Settings.get("reveal-timeout"), 15);
     this.rejoinGrace = Math.max(0, numberSetting(this.Settings.get("rejoin-grace"), 20));
+    this.minPlayers = Math.min(SEATS, Math.max(1, Math.round(numberSetting(this.Settings.get("min-players"), 2))));
     this._ShowRules();
     for (let i = 0; i < this.currentPlayers.length; i++) {
       if (i < this.playerHandles.length) this.playerHandles[i]!._SetPlayerNumber(i); // PlayerHandle behaviors store their own index
@@ -441,10 +447,14 @@ export class LiarsDiceMaster extends Behaviour {
     return this.numJoinedPlayers;
   }
 
+  _GetMinPlayers(): number {
+    return this.minPlayers;
+  }
+
   /** Task 5. Port: the referee checks the request (a seated player, two or more seated, no game running). */
   _InitializeGame(station: number, caller: Player): void {
     if (!this.Networking.IsOwner(this.gameObject)) return;
-    if (this.gameStarted || this.numJoinedPlayers < 2 || this.currentPlayers[station] !== caller.playerId) return;
+    if (this.gameStarted || this.numJoinedPlayers < this.minPlayers || this.currentPlayers[station] !== caller.playerId) return;
     this.Log("Starting new game with " + this.numJoinedPlayers + " number of players");
     this.gameStarted = true;
     this.playingPlayer = this.currentPlayers.length - 1;
@@ -460,7 +470,7 @@ export class LiarsDiceMaster extends Behaviour {
    */
   _NewRound(): void {
     if (!this.Networking.IsOwner(this.gameObject)) return;
-    if (this.numJoinedPlayers <= 1) {
+    if (this.numJoinedPlayers < this.minPlayers || this.numJoinedPlayers === 0) {
       // As upstream: Continue with one player left plays the roll, then NextTurn ends the game.
       this.SendCustomNetworkEvent(NetworkEventTarget.All, "DiceRollSound");
       if (this.postContestTurn) this.NextTurn(this.postContestTurnPlayer);
@@ -503,7 +513,7 @@ export class LiarsDiceMaster extends Behaviour {
     const next = this.ReturnNextUser(lastPlayer);
     this.postContestTurn = false;
 
-    if (this.numJoinedPlayers <= 1) {
+    if (this.numJoinedPlayers < this.minPlayers || this.numJoinedPlayers === 0) {
       this.gameStarted = false;
       this.lastWinner = this.playingPlayer >= 0 ? this.currentPlayers[this.playingPlayer]! : -1;
       this.lastWinnerName = this.playingPlayer >= 0 ? this.playerNames[this.playingPlayer]! : "";
@@ -805,7 +815,7 @@ export class LiarsDiceMaster extends Behaviour {
         // D04: in the lobby a departure only frees the seat (upstream ran NextTurn with no player to act).
         if (this.gameStarted) {
           if (this.phase === Phase.Bidding && this.playingPlayer === i) this.NextTurn();
-          if (this.numJoinedPlayers === 1) {
+          if (this.gameStarted && this.numJoinedPlayers < this.minPlayers) {
             this.numJoinedPlayers = 0;
             this.NextTurn();
           }
@@ -1033,7 +1043,7 @@ export class LiarsDiceMaster extends Behaviour {
       const pH = this.playerHandles[i]!;
       pH._ContinueState(false);
       if (this.currentPlayers[i] !== -1) {
-        pH._StartState(!this.gameStarted && this.numJoinedPlayers > 1); // D08: hidden again below two
+        pH._StartState(!this.gameStarted && this.numJoinedPlayers >= this.minPlayers); // D08: hidden again below two
         pH._SetOwner(this.currentPlayers[i]!);
         pH._SetPlayerNameUI();
         if (this.currentPlayers[i] === me) included = true;

@@ -5742,6 +5742,11 @@ ${label}`)));
       __publicField(this, "commitTimeout", 15);
       __publicField(this, "revealTimeout", 15);
       __publicField(this, "rejoinGrace", 20);
+      /**
+       * Port addition (`min-players`, default 2 as upstream): the fewest seated players a game starts with and goes on
+       * with. 1 allows practising alone (and the one-player Play-mode test): the turn then always comes back to that player.
+       */
+      __publicField(this, "minPlayers", 2);
       __publicField(this, "absentSince", new Array(SEATS).fill(-1));
       /** Each client checks the referee's result against the reveals it can see itself (PORT.md 3a, step 7). */
       __publicField(this, "integrityOk", true);
@@ -5760,6 +5765,7 @@ ${label}`)));
       this.commitTimeout = numberSetting(this.Settings.get("commit-timeout"), 15);
       this.revealTimeout = numberSetting(this.Settings.get("reveal-timeout"), 15);
       this.rejoinGrace = Math.max(0, numberSetting(this.Settings.get("rejoin-grace"), 20));
+      this.minPlayers = Math.min(SEATS, Math.max(1, Math.round(numberSetting(this.Settings.get("min-players"), 2))));
       this._ShowRules();
       for (let i = 0; i < this.currentPlayers.length; i++) {
         if (i < this.playerHandles.length) this.playerHandles[i]._SetPlayerNumber(i);
@@ -5827,10 +5833,13 @@ ${label}`)));
     _GetNumJoinedPlayers() {
       return this.numJoinedPlayers;
     }
+    _GetMinPlayers() {
+      return this.minPlayers;
+    }
     /** Task 5. Port: the referee checks the request (a seated player, two or more seated, no game running). */
     _InitializeGame(station, caller) {
       if (!this.Networking.IsOwner(this.gameObject)) return;
-      if (this.gameStarted || this.numJoinedPlayers < 2 || this.currentPlayers[station] !== caller.playerId) return;
+      if (this.gameStarted || this.numJoinedPlayers < this.minPlayers || this.currentPlayers[station] !== caller.playerId) return;
       this.Log("Starting new game with " + this.numJoinedPlayers + " number of players");
       this.gameStarted = true;
       this.playingPlayer = this.currentPlayers.length - 1;
@@ -5845,7 +5854,7 @@ ${label}`)));
      */
     _NewRound() {
       if (!this.Networking.IsOwner(this.gameObject)) return;
-      if (this.numJoinedPlayers <= 1) {
+      if (this.numJoinedPlayers < this.minPlayers || this.numJoinedPlayers === 0) {
         this.SendCustomNetworkEvent(NetworkEventTarget.All, "DiceRollSound");
         if (this.postContestTurn) this.NextTurn(this.postContestTurnPlayer);
         else this.NextTurn();
@@ -5883,7 +5892,7 @@ ${label}`)));
       if (!this.Networking.IsOwner(this.gameObject)) return;
       const next = this.ReturnNextUser(lastPlayer);
       this.postContestTurn = false;
-      if (this.numJoinedPlayers <= 1) {
+      if (this.numJoinedPlayers < this.minPlayers || this.numJoinedPlayers === 0) {
         this.gameStarted = false;
         this.lastWinner = this.playingPlayer >= 0 ? this.currentPlayers[this.playingPlayer] : -1;
         this.lastWinnerName = this.playingPlayer >= 0 ? this.playerNames[this.playingPlayer] : "";
@@ -6161,7 +6170,7 @@ ${label}`)));
         if (serialize) {
           if (this.gameStarted) {
             if (this.phase === Phase.Bidding && this.playingPlayer === i) this.NextTurn();
-            if (this.numJoinedPlayers === 1) {
+            if (this.gameStarted && this.numJoinedPlayers < this.minPlayers) {
               this.numJoinedPlayers = 0;
               this.NextTurn();
             }
@@ -6366,7 +6375,7 @@ ${label}`)));
         const pH = this.playerHandles[i];
         pH._ContinueState(false);
         if (this.currentPlayers[i] !== -1) {
-          pH._StartState(!this.gameStarted && this.numJoinedPlayers > 1);
+          pH._StartState(!this.gameStarted && this.numJoinedPlayers >= this.minPlayers);
           pH._SetOwner(this.currentPlayers[i]);
           pH._SetPlayerNameUI();
           if (this.currentPlayers[i] === me) included = true;
@@ -6763,7 +6772,7 @@ ${label}`)));
       this.SendCustomEventDelayedSeconds("_InteractionDelay", 0.5);
     }
     _StartGame() {
-      if (this.interactDelay && this.IsLocalOwner() && this.diceMaster._GetCanInteract() && this.diceMaster._GetNumJoinedPlayers() > 1) {
+      if (this.interactDelay && this.IsLocalOwner() && this.diceMaster._GetCanInteract() && this.diceMaster._GetNumJoinedPlayers() >= this.diceMaster._GetMinPlayers()) {
         if (this.yourTurn) this._LocalClickSound(1);
         this.Lockout();
         this._StartState(false);

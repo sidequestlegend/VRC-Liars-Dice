@@ -548,3 +548,26 @@ test("a button's buzz goes to the hand that clicked; both hands when the runtime
   assert.ok(ann!.haptics.length >= 2, "push and release");
   assert.deepEqual([...new Set(ann!.haptics.map((h) => h.side))], [0], "the left hand pulled the trigger: only the left buzzes");
 });
+
+test("min-players 1: one player can practise alone; the turn comes back to them and a challenge is judged", async () => {
+  const world = newWorld(25);
+  const elements = [{ "min-players": "1" }];
+  const ann = world.join({ name: "Ann", elements });
+  world.join({ name: "Bob", elements }); // watching
+  await settle(world);
+  await press(world, ann, 0, "join");
+  await until(world, "Ann seated", () => master(world, ann).numJoinedPlayers === 1);
+  assert.equal(ann.graph(SLUG).active.get("p1_start"), true, "Start shows with one seated");
+  await press(world, ann, 0, "start");
+  await waitPhase(world, Phase.Bidding);
+  assert.equal(master(world, ann).playingPlayer, 0);
+  const dice = allDice(world, [ann]);
+  await bid(world, ann, 2, 3);
+  assert.equal(master(world, ann).playingPlayer, 0, "the turn comes back to the only player");
+  assert.match(plain(master(world, ann).displayText.text), /^Ann's turn\n2 X 4 die/);
+  await callIt(world, ann);
+  const r = master(world, ann);
+  assert.equal(r.resultSum, count(dice, 3, true));
+  assert.equal(r.remaining[0], 4, "a challenge of one's own bid costs a die either way");
+  checkAgreement(world);
+});

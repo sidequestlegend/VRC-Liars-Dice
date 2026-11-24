@@ -1,0 +1,10 @@
+{
+  "name": "liarsdice-multi",
+  "timeout": 480,
+  "players": 2,
+  "elements": [
+    "<script>window.__ldPlan = \"multi\";</script>",
+    "<script src=\"{SERVER}/web/playtest/liarsdice-playtest.js\"></script>",
+    "<bs-snippet name=\"liars-dice\" title=\"Liar's Dice\" script=\"{SERVER}/web/pk-liars-dice.js\" position=\"0 0 1.3\" rotation=\"0 0 0\" ui-range=\"0\" windows=\"{SERVER}/kits/windows/liars-dice\" android=\"{SERVER}/kits/android/liars-dice\"></bs-snippet>"
+  ]
+}
