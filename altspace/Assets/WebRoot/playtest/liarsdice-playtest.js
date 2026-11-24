@@ -60,6 +60,15 @@
   const table = () => debug().table();
   const path = (key) => debug().pathOf(key).replace(/ /g, "%20");
   const probe = (what, key, extra) => cmd("probe " + HOLDER + " " + what + " " + path(key) + (extra ? " " + extra : ""));
+  /** Probes until the answer passes `ok` (a relay op lands in Unity a tick or two after the page's state changes). */
+  async function probeUntil(what, key, extra, ok, ms) {
+    const end = Date.now() + (ms || 5000);
+    for (;;) {
+      const v = await probe(what, key, extra);
+      if (ok(v) || Date.now() > end) return v;
+      await sleep(150);
+    }
+  }
   const plain = (t) => String(t).replace(/<\/?color[^>]*>/g, "").replace(/<\/?s>/g, "").replace(/<\/?b>/g, "");
 
   /** A click on a kit object through the desktop player: look at it, point the test's mouse at it, click. */
@@ -99,14 +108,14 @@
   async function bidThroughPanel(seat, multi, face) {
     await press(seat, FACES[face]);
     await until(() => debug().panel(seat).dieNumber === face, 4000);
-    const colour = await probe("uicolor", `p${seat + 1}_${FACES[face]}`);
+    const colour = await probeUntil("uicolor", `p${seat + 1}_${FACES[face]}`, "", (v) => v === "0.000 1.000 1.000 1.000");
     check(colour === "0.000 1.000 1.000 1.000", `the picked face button turns cyan (relay op uiColor), seat ${seat + 1}`, colour);
     while (debug().panel(seat).multiNum < multi) {
       const before = debug().panel(seat).multiNum;
       await press(seat, "plus");
       if (!(await until(() => debug().panel(seat).multiNum > before, 4000))) break;
     }
-    const number = await probe("text", `p${seat + 1}_number`);
+    const number = await probeUntil("text", `p${seat + 1}_number`, "", (v) => v === String(multi));
     check(number === String(multi), `the quantity on the panel reads ${multi}`, number);
     await sleep(600); // the panel's 0.5 s lockout after the last press of another button
     await press(seat, "submit");
@@ -121,9 +130,9 @@
     await press(0, "join");
     await until(() => table().seats[0] === me.id, 8000);
     check(table().seats[0] === me.id, "Join (a click on the station's selector) seats the player", JSON.stringify(table().seats));
-    const name = plain(await probe("text", "p1_name"));
+    const name = plain(await probeUntil("text", "p1_name", "", (v) => plain(v) === me.name));
     check(name === me.name, "the station shows the player's name (relay op text, colour tag)", name);
-    check((await probe("active", "p1_join")) === "False" && (await probe("active", "p1_leave")) === "True", "Join gives way to Leave Game", "");
+    check((await probeUntil("active", "p1_join", "", (v) => v === "False")) === "False" && (await probeUntil("active", "p1_leave", "", (v) => v === "True")) === "True", "Join gives way to Leave Game", "");
     await sleep(800);
     check((await probe("active", "p1_start")) === "True", "Start Game shows (min-players 1)", "");
     await sleep(600);
@@ -135,14 +144,14 @@
     check(!!dice && JSON.stringify(frames) === JSON.stringify(dice), "the player's own dice show their faces in Unity (relay op matFloat, URP flipbook shader)", `dice ${JSON.stringify(dice)}, frames ${JSON.stringify(frames)}`);
     const empty = await unityFrames(2);
     check(empty.every((f) => f === 8), "the dice of an empty station show the logo", JSON.stringify(empty));
-    const opening = plain(await probe("text", "display"));
+    const opening = plain(await probeUntil("text", "display", "", (v) => plain(v).includes("starts the round")));
     check(opening === `${me.name}\n starts the round\nOnes are Wild`, "the display says who starts the round", JSON.stringify(opening));
 
     // a bid through the panel: face four, + to 2, Submit
     const ok = await bidThroughPanel(0, 2, 3);
     check(!!ok, "the bid 2 X 4 is made through the panel buttons", `${table().multi} X ${table().die + 1}`);
     await sleep(800);
-    const display = plain(await probe("text", "display"));
+    const display = plain(await probeUntil("text", "display", "", (v) => plain(v).includes("2 X 4 die")));
     check(display === `${me.name}'s turn\n2 X 4 die\nOnes are Wild`, "the bid display in Unity reads the bid", JSON.stringify(display));
     const panel = debug().panel(0);
     check(panel.yourTurn && panel.min === 2, "the turn comes back to the only player, the quantity starts at the standing bid", JSON.stringify(panel));
@@ -153,7 +162,7 @@
     const result = await until(() => table().phase === PHASE.Result, 30000, 200);
     const sum = dice.filter((v) => v === 3 || v === 0).length;
     check(!!result && table().resultSum === sum, "Call it: the dice are revealed and counted (fours and wild ones)", `sum ${table().resultSum}, expected ${sum}`);
-    const text = plain(await probe("text", "display"));
+    const text = plain(await probeUntil("text", "display", "", (v) => plain(v).includes("Actual")));
     check(text.includes(`Actual ${sum} X 4 die`), "the result shows on the display", JSON.stringify(text));
     const tint = await probe("color", "p1_die0", "_Color");
     const counts = dice[0] === 3 || dice[0] === 0;
@@ -167,9 +176,10 @@
     const rule = await probe("text", "rules");
     check(rule === "To begin each round, all players roll their dice simultaneously.", "the rules button shows the first rule line", rule);
     await clickKey("creditsButton", "Credits");
-    const open = await probe("active", "creditsPanel");
+    const open = await probeUntil("active", "creditsPanel", "", (v) => v === "True");
+    await sleep(600);
     await clickKey("creditsPanel", "the credits panel");
-    const closed = await probe("active", "creditsPanel");
+    const closed = await probeUntil("active", "creditsPanel", "", (v) => v === "False");
     check(open === "True" && closed === "False", "the credits panel opens and closes", `${open}, ${closed}`);
     check(table().integrityOk === true, "the page's own check of the referee's result agrees", "");
   }
@@ -237,7 +247,7 @@
       check(!!ok, "station 1 bids 2 X 3 through its panel", `${table().multi} X ${table().die + 1}`);
     } else {
       const seen = await until(() => table().multi === 2 && table().die === 2 && table().playing === 1, 60000, 250);
-      const display = plain(await probe("text", "display"));
+      const display = plain(await probeUntil("text", "display", "", (v) => plain(v).endsWith("2 X 3 die\nOnes are Wild")));
       check(!!seen && display.endsWith("2 X 3 die\nOnes are Wild"), "the bid arrives at the other page and shows on its display", JSON.stringify(display));
       await sleep(1000);
       await press(1, "callIt");

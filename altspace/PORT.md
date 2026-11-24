@@ -1,12 +1,11 @@
 # Liar's dice: port analysis
 
-Status (2026-11-24, second pass): **the rules are ported and pass rung 1.** `altspace/ts/` holds the
-TypeScript translation on the portkit runtime (one `src/<UpstreamFile>.ts` per upstream gameplay file), golden
-vectors made by compiling the upstream C# unchanged with dotnet 8 (`ts/golden/`), and multi-client scenarios
-on the fake room (`ts/test/`): `npm test` runs 17 tests, all passing; `npm run build` bundles
-`pk-liars-dice.js` (358 KB). No Unity work yet: `ts/bindings.json` is provisional (section 7), and the kit,
-bundles and Play-mode rungs are still to do. What was decided and what the runtime lacks: section 2a and
-section 10. The first pass (analysis) follows unchanged except where marked.
+Status (2026-11-24, third pass): **the kit is built and the editor rungs are run** (section 11, evidence in
+`TESTS.md`). The rules were re-synced to the fixed portkit (every runtime gap of section 10 is closed in the kit;
+`ts/src/gaps.ts` is gone), the Unity project `altspace/` builds the kit with `Assets/Kit/Editor/LiarsDiceKitBuilder.cs`,
+`ts/bindings.json` is the builder's, and every upstream asset that may not ship was replaced or left out (section 6a).
+Second pass: the rules ported and rung 1 (`altspace/ts/`, golden vectors from the upstream C#, scenarios on the fake
+room). The first pass (analysis) follows unchanged except where marked.
 
 First pass: analysis only, written 2026-11-24. The upstream C# was read, not compiled; the prefabs, materials,
 controller and clips were read as YAML (scripts matched by the GUID in their `.meta` files); the two FBX files
@@ -201,7 +200,7 @@ given. Left out: not ported. Kit: belongs to the Unity kit, not to the rules. Te
 game; challenge true and false; ones wild; leaving; late joiner; referee leaves; cheating client; no reveal / no
 roll; two Joins; two tables; rules button and budget).
 
-**Totals: 50 done, 10 changed, 2 left out, 1 kit (F01 to F63); D01 to D16: 12 fixed, 1 kept as upstream, 3 gone or not carried over.**
+**Totals (third pass): 52 done, 9 changed, 2 left out (F01 to F63; F59 now done in the kit); D01 to D16: 12 fixed, 2 kept as upstream, 2 gone or not carried over.**
 
 | # | Status | Evidence or note |
 |---|---|---|
@@ -213,7 +212,7 @@ roll; two Joins; two tables; rules button and budget).
 | F09, F10, F11 | Done | S4, S1; Start hidden again below two seated (D08) |
 | F12 | Done | S1: station 1 opens |
 | F13 | Changed | Each player's dice are a fair self-roll (section 3a as built); each face 0 to 5 from SHA-256, 48 bits mod 6 |
-| F14 | Changed | Large or small roll by dice in play, as upstream; the random pitch is computed but cannot reach the app (runtime gap G1) |
+| F14 | Changed | Large or small roll by dice in play, as upstream, at a random pitch 0.9 to 1.1 (`AudioSourceRef.pitch`, relay op `audioPitch`); each die roll is a fair self-roll (F13) |
 | F15 | Done | S1 checks, every round, that each page shows its own faces and "?" for everyone else, and cannot compute anyone else's draw |
 | F16, F17 | Done | V5 (3,000 displays against `UpdateText`) |
 | F18, F19, F20, F21 | Done | V3 (10,000 panels against `HighLightButton` and `_Submit`); colours through `uiColor`; the referee re-checks every bid |
@@ -231,16 +230,16 @@ roll; two Joins; two tables; rules button and budget).
 | F39, F40 | Done | S2 (loser opens; challenger opens after losing), V4 |
 | F41, F42 | Done | S1: "<name> is the Winner", applause, seats empty, Join everywhere |
 | F43, F44, F45, F46, F47 | Done | S4 |
-| F48 | Done | Menu buttons bound as click events, slider as `uiSlider`; the credit line's text is kit work |
-| F49 | Changed | Volume is kept per page but cannot reach the app (gap G1) |
+| F48 | Done | Menu buttons are click colliders, the slider a uGUI slider (`uiSlider`); the credit line stays and a Credits button opens the licence notices |
+| F49 | Done | The slider sets the table speaker's and the four station speakers' volume on this page (`audioVolume`) |
 | F50, F51 | Done | Local; S11 for the rules line |
-| F52 | Changed | Click sounds play; their pitches cannot reach the app (gap G1) |
-| F53 | Done | Through the table speaker's clip list (`$clip` with `on`; gap G3 until the `audio` op exists) |
+| F52 | Done | Click sounds at upstream's pitches (`audioPitch`); the clips themselves are CC0 replacements (section 6a) |
+| F53 | Changed | Through the relay's `audio` op on the table speaker (3D, 0.3 to 8 m); boo and cheer are CC0 jingles now (section 6a) |
 | F54 | Done | Every button is its selector's click |
-| F55 | Changed | Point and click (coordinator decision): animator bool pulsed 0.15 s, push-in sound, both hands buzz |
+| F55 | Changed | Point and click (coordinator decision): animator bool pulsed 0.15 s (corrected push clips, section 11), push-in sound, the hand that clicked buzzes (both when the runtime cannot tell) |
 | F56, F57 | Left out | No finger bones on the page; `PositionTracker.ts` is an empty class |
 | F58 | Changed | Distance from the head to the table centre on the tick (`ui-range`, default 3.5 m), canvases switched; on while the position is unknown |
-| F59 | Kit | Billboard component on the centre display |
+| F59 | Done (kit) | `BS.BSBillboard` on the centre display, turning about Y only |
 | F60, F61, F62 | Done | Digests agree after every step; S5; S6 |
 | F63 | Changed | `debug="true"` logs to the console; the log panel is left out |
 | D01 | Fixed | Result is state: S5 (late arrival sees the result text and dice) |
@@ -255,7 +254,7 @@ roll; two Joins; two tables; rules button and budget).
 | D12 | Fixed | Round fields synced; S6 (referee leaves mid-bidding, then the next referee leaves mid-reveal) |
 | D13 | Fixed | Counts reset at game end: S1 |
 | D14 | Fixed | Commands are numbered and run once by the referee; no sound from a snapshot: S5 |
-| D15 | Gone | Pitch does not reach the app at all yet (G1) |
+| D15 | Kept | Pitch now reaches the app, so boo, cheer and applause play at the last roll's pitch, as upstream |
 | D16 | Not carried over | |
 
 ---
@@ -343,8 +342,9 @@ deadline is `forfeit`; both put the player in `missing`, with the forfeit rules 
 when every seated player's draw is numbered; a player still without a number at `commit-timeout` is removed as
 if they had left. What differs from the proposal below: no hand-made hash string, salt or `c`/`o` leaves (the
 runtime's `fd`/`fr` user-state entries and `fd` table do that); no `taskAck` (the runtime's numbered commands
-do that); a reload is not resumed (N12), because the draw secret lives in page memory and a reload is a new
-session (gap G6). Every client repeats the count from the reveals it sees (`integrityOk`, checked in S1).
+do that). **Third pass:** a reload is resumed (N12): the kit saves the draw on the device and moves the referee's entry
+to the new session (G6 fixed in the kit), and the game holds a seated player's seat for `rejoin-grace` seconds
+(default 20) during a game, giving it to the same user's new session (scenario "a seated player reloads ..."). Every client repeats the count from the reveals it sees (`integrityOk`, checked in S1).
 
 **Why.** Upstream sends every die to every client (`M:29`) and hides them by drawing "?" (`M:781`). Ported
 as is, all 20 values would sit in public space state where any player can read them from the page console.
@@ -719,12 +719,44 @@ Shaders and materials:
 
 Third-party items and licences: the table in section 1.
 
+### 6a. Art replacements and licence checks (third pass, 2026-11-24)
+
+Every download went to a new folder of its own, was checked for its file type, then copied in; the same list, with the
+licence texts, is in `THIRD-PARTY-NOTICES.md` (also inside both bundles). `PortKit/Liars Dice/Check Licences` fails the
+build check if the saved kit prefab depends on any upstream file named below as not shipped (run: PASS, 71 dependencies).
+
+| Upstream file | Problem | Done | Source and licence (checked 2026-11-24) |
+|---|---|---|---|
+| `Heavitas.ttf`, `Heavitas SDF.asset`, `Heavitas SDF billboard.asset` | personal-use font | **Replaced, not imported** (the importer skips `.ttf` and `.asset`). Every text is Archivo Black (`Assets/Kit/Fonts/ArchivoBlack SDF.asset`, a static atlas of ASCII, Latin-1 and typographic quotes) with Liberation Sans as fallback | Archivo Black, Omnibus-Type, https://github.com/google/fonts/tree/main/ofl/archivoblack, **SIL OFL 1.1** (`OFL.txt` kept as `Assets/Kit/Fonts/ArchivoBlack-OFL.txt`) |
+| `all dice.png`, frame 8 (logo lettered in Heavitas) and frame 6 ("?", font not named) | Heavitas glyphs in a texture | **Redrawn**: `Assets/Kit/Art/dice_atlas.png`, made by `altspace/tools/make_art.py` from the fork's atlas: the "?" inpainted out and lettered again, the logo cell cleared and lettered "LIAR'S DICE" in Archivo Black, white with a black outline. No Heavitas glyph is left | the rest of the atlas is upstream's (MIT) |
+| `all dice normals.png` | no effect upstream | Dropped | |
+| `dice roll large.wav` | needs attribution | **Kept, credited** (notices, credits panel), imported as mono | "dice_06.wav" by dermotte, https://freesound.org/s/220744/, **CC BY 4.0** (licence link read on the page) |
+| `dice roll small.wav` | | Kept, credited | "Dice Rolling on Table" by Flem0527, https://freesound.org/s/629982/, **CC0** (read on the page) |
+| `audience-clapping.wav` | | Kept, credited | "Audience Clapping.wav" by Zeraora, https://freesound.org/s/429422/, **CC0** (read on the page) |
+| `click-01.wav` | origin not stated | **Replaced** by `click_001.ogg` | Kenney "Interface Sounds", https://opengameart.org/content/interface-sounds (author Kenney, **CC0**, `License.txt` in the pack) |
+| `click w-pitch amp.wav` | origin not stated | **Replaced** by `select_002.ogg` | same pack |
+| `chime.wav` | origin not stated | **Replaced** by `confirmation_001.ogg` | same pack |
+| `boo.wav` | origin not stated | **Replaced** by `jingles_SAX01.ogg`, a falling sax phrase (no CC0 crowd boo was found) | Kenney "85 short music jingles", https://opengameart.org/content/85-short-music-jingles (**CC0**, `license.txt` in the pack) |
+| `yay.wav` | origin not stated | **Replaced** by `jingles_SAX02.ogg`, a rising phrase | same pack |
+| `teeth.png` (wild icon) | origin not stated | **Replaced** by `Assets/Kit/Art/wild.png`, a star with a "1" drawn by `make_art.py` | made for the port |
+| `dice flipbook.shader` | built-in pipeline | **Remade**: `Assets/Kit/Shaders/DiceFlipbook.shader` (URP, one pass, main light and ambient, whole-number cell maths; `_frame` and `_Color` set through the relay's `matFloat` and `color` ops on each renderer's own material) | made for the port |
+| `TMP_SDF-Mobile-Billboard.shader`, `TMPro*.cginc` | built-in pipeline, no licence file | Not imported; `BS.BSBillboard` turns the display | |
+| `die.mat`, `table.mat`, `sphere.mat` | built-in Standard | `Assets/Kit/Materials/Die.mat` (the flipbook), `Table.mat` (URP Lit, URP's own keyword setup run on it); the models' material remaps to `die.mat` are removed, so the old atlas is no dependency | |
+
+The Kenney packs were taken from OpenGameArt, where Kenney published them: kenney.nl's own download goes through a
+donation page whose download link this session was not allowed to follow automatically.
+
+Textures as imported: table albedo and normal 1024 (Windows) / 512 (Android, ASTC 6x6), metallic 256, dice atlas 1024 /
+512, face sprites 128, button 256 / 128, wild icon 128. Bundles: Android 1,865 KiB, Windows 3,699 KiB.
+
 ---
 
 ## 7. Translation map
 
-**`ts/bindings.json` is provisional** (written 2026-11-24 from the object model of section 5, before any kit
-build). The kit builder (`LiarsDiceKitBuilder`) will write the real one; until then these are the object keys and
+**Third pass: `ts/bindings.json` is the kit builder's** (187 objects, 122 refs, 67 behaviours, 5 events). The keys below
+were kept (the builder asks for them), paths now start with `LiarsDiceTable/`, the wild image is `one/Image wild`, clips
+are held by the behaviour's own object, and a credits button and panel were added. What follows was the provisional
+plan (written 2026-11-24 from the object model of section 5, before any kit build). The kit builder (`LiarsDiceKitBuilder`) will write the real one; until then these are the object keys and
 paths it is expected to export, relative to the kit root: `display`, `rules`, `billboard`, `master`, `speaker`
 (the table's AudioSource, clip list yay 0, boo 1, roll small 2, roll large 3, applause 4), `proximity`, `menu`,
 `onesWildButton`, `onesWildCheck`, `volumeSlider`, `soundButton`, `soundCheck`, `leaveGameButton`; per station
@@ -908,19 +940,19 @@ played alternately with the first. Ones-wild toggled on one page shows on the ot
 
 ### Runtime gaps found while porting the rules
 
-Local workarounds live in `ts/src/gaps.ts` and in the game's own files; nothing under `portkit/` was changed.
+Second pass: local workarounds lived in `ts/src/gaps.ts`. Third pass: all of them are gone; every row is fixed in the kit.
 
-| # | Gap | Effect here | Workaround |
-|---|---|---|---|
-| G1 | No relay op or `AudioSourceRef` member for an audio source's **pitch or volume** | Roll pitch (F14), click pitches (F52), the volume slider (F49) do not reach the app | `Speaker` in `gaps.ts` records pitch and volume (tests read them) and plays with `PlayOneShot`. Needs an `audioPitch` / `audioVolume` op |
-| G2 | `Color` has no `cyan`, `gray` or `HSVToRGB` | | `Cyan`, `Gray`, `HSVToRGB` (Unity's formula) in `gaps.ts` |
-| G3 | The `audio` relay op (`$clip` with `on`) is "asked for, not built yet" in the README | No table or station sound in the app until it is | None needed in TypeScript |
-| G4 | A game cannot send its own relay op from TypeScript: `RelayHost.value`/`event` are private and `HostActions` has fixed members, although the README lets a kit builder add ops | G1 could not be worked around with a game op | None |
-| G5 | The fair-draw table `fd` is **public** space state, which the README's own Trust rule says any client can write; `Secrets` does not check who wrote it | A modified client could overwrite another player's pinned hash or number, making an honest reveal look `rejected` (forfeit), or replace its own entry | None in the game. Suggest the table move to protected state or the referee's user state, or each client keep the first pin it saw per label (as section 3a proposed) |
-| G6 | A draw belongs to a session id, and the secret is kept only in page memory | A reload mid-round loses the player's dice; they are removed at the next deadline as if they had left (Q5, N12 not possible) | None |
-| G7 | A `click` event carries no hand | FingerTrigger buzzes both controllers | Both hands |
-| G8 | Under `referee: "declared"`, a player's departure is delivered at once even with no referee, so a master-guarded `OnPlayerLeft` can be lost | Not hit here (the game uses `"anyone"`) | `LiarsDiceMaster.Reconcile()` frees a seat whose player has been gone 3 s anyway |
-| G9 | `SendCustomEventDelayedFrames` counts 50 ms ticks | 30 frames would be 1.5 s | Seconds (0.5 s) |
+| # | Gap | Status (third pass, re-synced to portkit `c7abead`, `a404a3c`, `c876a0c`) |
+|---|---|---|
+| G1 | No pitch or volume for an audio source | **Fixed in the kit**: `AudioSourceRef.pitch` / `.volume` / `clip` / `Play()`; `Speaker` deleted |
+| G2 | `Color` lacks cyan, gray, `HSVToRGB` | **Fixed in the kit**: `Color.cyan`, `Color.gray`, `Color.HSVToRGB`; `gaps.ts` deleted |
+| G3 | No `audio` relay op | **Fixed in the kit** (the `audio` op; the builder mirrors each clip list into `PkClips`) |
+| G4 | No game relay op from TypeScript | **Fixed in the kit** (`Host.op`); this game needs none of its own |
+| G5 | The fair-draw table was public space state | **Fixed in the kit**: the numbers live in the referee's user state and every client keeps the first pin it saw. The stated loss is removed |
+| G6 | A reload lost the player's dice | **Fixed in the kit**: the secret is saved on the device and the referee moves the entry to the new session. The game now holds the seat for `rejoin-grace` s and gives it back to the same user (scenario "a seated player reloads its page mid-round", and rung 4's reload during the result). The stated loss is removed |
+| G7 | A click names no hand | **Fixed in the kit** (`Input.LastClickSide`): FingerTrigger buzzes that hand, both when null (scenario) |
+| G8 | Departures with no referee | **Fixed in the kit** (held until a referee exists); `Reconcile()` stays for a referee that joined after the departure, and now also hands a seat back after a reload |
+| G9 | A delayed frame is a tick | Documented in the kit; the port keeps 0.5 s |
 
 ### Changed
 
@@ -954,7 +986,7 @@ Local workarounds live in `ts/src/gaps.ts` and in the game's own files; nothing 
 | # | Risk or question | What decides it |
 |---|---|---|
 | Q1 | **Closed 2026-11-24: fair self-roll through the runtime's `Draw` (section 3a, as built).** Was: **A modified page can choose its own dice.** The plan's scheme stops peeking and changing, not choosing; upstream did not let players choose. The seeded roll in section 3a closes it for about 60 lines and one more message per player per round | Lead: ship the plan's scheme, or the seeded one |
-| Q2 | **Heavitas is not MIT.** Shipping it, its two atlases or the frame-8 lettering needs a licence nobody here holds. `dice roll large.wav` needs a CC BY 4.0 credit. Both readings came through an automated page fetch | A person reads the dafont and freesound pages once; then replace the font |
+| Q2 | **Closed (third pass): Heavitas replaced by Archivo Black (OFL) everywhere, the atlas lettering redrawn, `dice roll large.wav` credited (CC BY 4.0, page read), the five unsourced sounds and `teeth.png` replaced (section 6a).** Was: Heavitas is not MIT; `dice roll large.wav` needs a CC BY 4.0 credit | Done |
 | Q3 | **Mostly answered by the runtime 2026-11-24** (`OnPlayerLeft`, `GetOwner`, unowned behaviours belong to the referee, `isSnapshot`, `matFloat`, `uiColor`, `uiSlider`, synchronous SHA-256, draws in user state); still open: gaps G1, G4, G5 above. Was: **README additions this game needs:** `OnPlayerLeft` on `Behaviour`; `Networking.GetOwner`; a rule that an unowned behaviour belongs to the referee; no `OnDeserialization` echo to the writer and a way to tell a snapshot from a change; relay ops for a material float (or the alpha trick) and a UI graphic colour; a slider event; where `commit()` publishes (this design wants user state). Hashing through WebCrypto is asynchronous, which does not fit rule code translated line for line; a small synchronous SHA-256 in the runtime would | Pathfinder and README owner |
 | Q4 | **Kept as upstream (2026-11-24).** D10: keep "the bidder is the previous taken seat" or record who actually bid? Recording is one field and changes the outcome only after a mid-round leave | Lead |
 | Q5 | What counts as leaving? Upstream: leaving the world, at once. On the relay a sleeping headset or a page reload may show as a leave and remove the player from the game. A grace period would be a rule change. Whether a resumed session raises `user-left` at all is not known | Spike on the relay; lead |
@@ -964,3 +996,47 @@ Local workarounds live in `ts/src/gaps.ts` and in the game's own files; nothing 
 | Q9 | Relay traffic: a naive redraw is about 130 relay calls per client per state change. With caching it is a handful, but the cost of one `SendToVisualScripting` call in the app is unmeasured | Rung 5 |
 | Q10 | Name colours will not match VRChat's for the same name | Accept |
 | Q11 | Not determined in this analysis: the Unity and SDK versions (not in the repo); what the three missing GUIDs were; the origin of five sounds and `teeth.png`; whether the x and y curves of the 15 clips do anything; whether UdonSharp corrects the stations' serialised sync mode; the "as read" defects D04, D05, D06, D11, D14 were not reproduced | |
+
+---
+
+## 11. The Unity kit (third pass, 2026-11-24)
+
+Project `altspace/` (portkit template, Unity 6000.3.21f1, Creator SDK 4.0.29, Play-mode page port 42800). Upstream
+imported by `upstream_import.json` (47 asset files with their `.meta`, 5 stand-ins; not the Heavitas font, the TMP
+assets, the built-in shaders or the compiled Udon programs). Upstream builds a table with its editor menu
+(`editor/GenerateDiceTable.cs`: instantiate `Liars Dice Table.prefab`, optionally a logger); `LiarsDiceKitBuilder.cs`
+does the same from the imported prefab (never compiling upstream C#), then:
+
+| Step | What |
+|---|---|
+| Placement | the upstream root becomes `LiarsDiceTable`, 0.845 m above the kit root, so the snippet's `position` is the floor under the table centre |
+| Not ported | `Position Tracker` (fingertip spheres, F55 to F57) and the logger |
+| Colliders | VRChat's trigger volumes go (the 7 m `HandTrackerToggle` cylinder, the station spheres, the canvas and menu boxes: they would swallow clicks); the 60 selectors become solid click colliders on layer 5; the three menu buttons get click boxes on their rectangles |
+| uGUI | GraphicRaycasters and CanvasScalers removed; buttons lose their calls into VRChat's UdonBehaviour and their colour transition (the page colours them, `uiColor`); the volume slider keeps uGUI through a nested canvas with its own raycaster (read from above, as the menu lies on the table) and reports `uiSlider`; built-in sprites (Background, UISprite, the missing check mark) become plain images |
+| Text | every TextMesh Pro text uses Archivo Black SDF (static atlas) with Liberation Sans as fallback, rich text on (name colours, struck-through ones line) |
+| Centre display | `BS.BSBillboard`, turning about Y only (F59) |
+| Materials | `Table.mat` URP Lit with upstream's albedo, normal and metallic maps (URP's keyword setup run); `Die.mat` on `LiarsDice/DiceFlipbook`, the redrawn atlas |
+| Push animation | upstream's 15 clips set the pressed button's whole local position to (0, -7, 0.95), so a press would move any button but Join to the panel's centre; the builder copies the controller and clips to `Assets/Kit/Animations` keeping each button's own x and y |
+| Sounds | the stand-ins' clip fields are pointed at the replacements before the bindings are written; every speaker is 3D, linear, 0.3 to 5 m (stations) or 8 m (table) |
+| Behaviours | master, four stations, `prox`, 60 FingerTriggers, the credits button; ids `master`, `p1`..`p4`, `prox` pinned in `bindings.lock.json` (the tests name them); `playerHandles`, `diceMesh`, `numButtons`, `otherButtons`, `speaker`, `diceMaster`, `behavior`, `anim`, `canvases` written as the TypeScript expects |
+| Credits | a Credits button on the menu panel and a panel with the notices (`CreditsPanel.ts`, local) |
+| Relay | the standard graph only (49 members, all on the allow list); no game ops, no game graphs |
+
+New snippet settings: `rejoin-grace` (20 s; the seat is held for a reloading player during a game) and `min-players`
+(2; 1 lets one person practise and is what the one-player Play-mode test uses).
+
+### Checklist after the kit
+
+F01 to F63: 52 done, 9 changed, 2 left out (F56, F57: no finger bones). Changed: F08 (name colours from a port hash),
+F13 (fair self-roll), F14 (roll per player, as a fair draw), F27 (0.5 s lockout), F33 (dice shown after the reveals are
+checked), F53 (jingles for boo and cheer), F55 (point and click), F58 (head distance instead of a trigger), F63 (console
+log). Kit-only rows: F48 (credits), F54 (clicks), F59 (billboard) done in the kit and checked in Play mode where rung 3
+says so.
+
+### Still unverified
+
+Everything in the app and on a Quest (rung 5): laser clicks on the 4 cm selectors, the uGUI slider with a controller,
+`BS.BSBillboard` on a kit object in the app, haptics on a real hand, sound levels and the 3D roll-off, the flipbook
+shader on Quest's GPU (Vulkan / GLES3), frame time with 51 TextMesh Pro texts, relay traffic per state change (Q9), and
+the page timers. In Play mode: VR input (only the desktop mouse path ran), the volume slider (bound and built, not
+dragged), ProximityEnable (the tests run with `ui-range="0"`), three or four players, and the referee leaving (Node only).
