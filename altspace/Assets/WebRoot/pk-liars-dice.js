@@ -7456,13 +7456,16 @@ ${label}`)));
           challenger: m.challenger,
           lastWinnerName: m.lastWinnerName,
           display: m.displayText.text,
-          integrityOk: m.integrityOk
+          integrityOk: m.integrityOk,
+          integrity: m.integrity
         };
       },
       /** The frame and tint each of the 20 dice shows on this page. */
       frames: () => master().DieFrames(),
       /** This page's own dice for a seat (null unless it is this page's seat in a round). */
       myDice: (seat) => master().MyDice(seat),
+      /** Whether this page's player's dice for this round are gone (shown as the red X, with a line on the display). */
+      myDiceLost: (seat) => master().MyDiceLost(seat),
       /** A station's panel as this page draws it. */
       panel: (seat) => {
         const s = station(seat);

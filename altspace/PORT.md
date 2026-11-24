@@ -989,7 +989,7 @@ Second pass: local workarounds lived in `ts/src/gaps.ts`. Third pass: all of the
 | G3 | No `audio` relay op | **Fixed in the kit** (the `audio` op; the builder mirrors each clip list into `PkClips`) |
 | G4 | No game relay op from TypeScript | **Fixed in the kit** (`Host.op`); this game needs none of its own |
 | G5 | The fair-draw table was public space state | **Fixed in the kit**: the numbers live in the referee's user state and every client keeps the first pin it saw. The stated loss is removed |
-| G6 | A reload lost the player's dice | **Fixed in the kit**: the secret is saved on the device and the referee moves the entry to the new session. The game now holds the seat for `rejoin-grace` s and gives it back to the same user (scenario "a seated player reloads its page mid-round", and rung 4's reload during the result). The stated loss is removed |
+| G6 | A reload lost the player's dice | **Fixed in the kit**: the secret is saved on the device and the referee moves the entry to the new session. The game now holds the seat for `rejoin-grace` s and gives it back to the same user (scenario "a seated player reloads its page mid-round", and rung 4's reload during the result). The stated loss is removed. Fourth pass: a reload can no longer re-roll (portkit `30881dd`), `beginDraw` is called at once (the 3 s wait is gone), and a reload on another device loses that round's dice: the player is told (section 12) |
 | G7 | A click names no hand | **Fixed in the kit** (`Input.LastClickSide`): FingerTrigger buzzes that hand, both when null (scenario) |
 | G8 | Departures with no referee | **Fixed in the kit** (held until a referee exists); `Reconcile()` stays for a referee that joined after the departure, and now also hands a seat back after a reload |
 | G9 | A delayed frame is a tick | Documented in the kit; the port keeps 0.5 s |
@@ -1087,3 +1087,53 @@ Everything in the app and on a Quest (rung 5): laser clicks on the 4 cm selector
 shader on Quest's GPU (Vulkan / GLES3), frame time with 51 TextMesh Pro texts, relay traffic per state change (Q9), and
 the page timers. In Play mode: VR input (only the desktop mouse path ran), the volume slider (bound and built, not
 dragged), ProximityEnable (the tests run with `ui-range="0"`), three or four players, and the referee leaving (Node only).
+
+---
+
+## 12. Fourth pass: re-sync to portkit `812f285` and the review's findings (2026-11-25)
+
+### Re-sync
+
+`portkit/tools/sync.sh liars-dice` (both `unity/` and `ts/`). Changes the kit pass asked of this game:
+
+| Kit change | Done here |
+|---|---|
+| `beginDraw(label)` reuses the secret saved for that label; `hasSavedDraw()` (portkit `30881dd`) | `PlayerHandle.RollOwnDice` calls `beginDraw` at once; the 3 s wait after a page start is gone (T1 failed before: 3.16 s) |
+| `TextRef` sends its first `""` (portkit `f3eaaa1`) | The builder no longer blanks upstream's placeholder texts (rules line, the four name displays, the quantity); rung 3 checks an empty station's name and the rules line read `""` in Unity |
+| Importer `skip_files` (portkit `d8f370d`) | `upstream_import.json` names the Heavitas files, the built-in shaders and includes, and the compiled Udon assets instead of skipping every `.ttf`, `.asset`, `.shader` and `.cginc` (same 47 files imported) |
+| Kit photos | Kept the Play-mode evidence pictures (`playtest/*.jpg`) |
+| Debug hooks only on test pages; digests compared at equal `version()` | The Play-mode pages are made by `KitPlayTest` (which sets `window.__pk1_debug`); rung 4 compares `stamp()`s at equal versions |
+| Space-state writes paced, one action one batch | The referee's number table (its user state) can reach a page a tick after the bidding phase (space state): the Node helpers wait for each seated page's own dice as well as the phase |
+
+### Findings (REVIEW-FINDINGS.md, liars-dice)
+
+| # | Finding | What was done | Test (fails before the fix) |
+|---|---|---|---|
+| 1 | [kit] A referee picks the number of its own draw and can grind it; PORT.md said "nobody can pick them" and the trust table did not name the referee | Fixed in the kit (portkit `bf8b5c6`: a witness numbers the referee's draw). Section 3a and the trust table (section 3a, "What it does and does not protect") now say what a modified referee can and cannot do. Its ground draw is `rejected` on every honest page, which then shows red X on its dice | T6 "a modified referee that grinds its own number is rejected, and if it counts its dice anyway every page says so" |
+| 2 | The kit predates `30881dd`; drop the 3 s wait; tell a player whose draw was rejected | Re-synced; `beginDraw` at once; `MyDiceLost`: a draw that cannot come back (a reload on another device) or is rejected shows the red X on the player's own dice and "Your dice did not come back with the reload: you are out at the challenge" on their display; a rejected draw shows the red X on every page. **Kit gap found on the way** (below): a reloaded referee's draw could not come back; worked around in the game | T1 (no wait), T2 (the referee reloads), T3 (another device: told, red X, out at the challenge, a forced re-roll rejected everywhere) |
+| 3 | A challenger who withholds escapes the forfeit when the bidder also withholds | Both are out; the display names both | T4 |
+| 4 | The integrity check only warned in the console, and took the die count from the referee's `dieValues` | `CheckIntegrity` counts from what the page saw during the round, checks reveals, rejected or forfeit draws counted, valid reveals put out, the sum, the kind, the loser and the dice left; `integrity` = pending / ok / partial / failed; a failure shows "Check failed: this result does not match the dice shown" on that page's display | T5 (a die marked lost), T6, T7 (honest: ok; a late arrival: no false alarm) |
+| 5 | Secrecy test S1 could not catch a leak into `dieValues` or user state during bidding | The review's leak probe became T8: it records every message every page sends and checks on every tick before the challenge that every page's `dieValues` is all -1, no user state holds a reveal, and no page can compute another's draw; T9 and T10 show it catches a reveal published early and a die written into `dieValues`. S1 also checks `dieValues` | T8, T9, T10 |
+| 6 | Liberation Sans ships as the fallback atlas with no copyright line in the notices | Copyright line in `THIRD-PARTY-NOTICES.md` and the credits panel; every licence text the notices name is in `Assets/Kit/Licenses/` and in both bundles (section 6a) | rung 2 (`portkit_bundles.txt` lists the texts) |
+
+### Kit gap found (not fixed in portkit; worked around here)
+
+**A new referee does not publish the number table it carries on until an entry changes** (`portkit/ts/src/secrets.ts`
+`officiate()`, `refrecord.ts` `RefereeTable`). A page that starts in between reads an empty table: a reloaded page's
+saved draw cannot come back (`restoreDraw` finds no entry), and because `newEpoch()` takes that empty table as its
+baseline, every entry numbered before looks live to it and is judged against the new referee: an entry the previous
+referee numbered (`r`, by another session than the publisher) and a witnessed entry whose witness is now the referee are
+both judged "bad" there. In this game that is the referee reloading its own page mid-round: its draw was `none` on every page and it
+forfeited at the challenge (T2 fails without the workaround). Workaround: `LiarsDiceMaster.PublishDrawTable()` (the
+referee writes the table it carries when its own user state has none; it reaches into `Secrets`' private `numbers`).
+Proposed kit fix: in `officiate()`, write the working table once per referee term when the referee's own `fn` record is
+absent or of another epoch; and in `newEpoch()`, take no baseline while the current referee has published nothing in
+this epoch but a last table from a previous referee exists (use that one).
+
+### Known issues left
+
+- A page that arrives after the bidding checks the result only in part (`partial`): it never saw the dice counts.
+- If a referee's witness leaves before its answer reaches a page, that page rejects the referee's draw (a kit limit,
+  portkit README): it shows red X on the referee's dice and, at the challenge, "Check failed". Rare; a new round clears it.
+- Bid values in the result (`resultMulti`, `resultDie`) are not checked against the bids a page saw: the relay may merge
+  state writes, so a page cannot be sure it saw the last bid; the bid is shown on every display during the bidding.

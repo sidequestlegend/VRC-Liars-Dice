@@ -5,7 +5,7 @@
 // window.__ldPlan: "single" (one player, min-players="1": take a station, start, bid through the panel, read the bid
 // display, call it) or "multi" (two Local Multiplayer players: a full round with a challenge; each sees only their own
 // dice before it, both see the same dice after; the second player reloads its page during the result and comes back to
-// its seat; state digests match).
+// its seat; state digests match at equal versions).
 (function () {
   "use strict";
   const KEY = "liars-dice:0";
@@ -135,6 +135,11 @@
   // ---- one player --------------------------------------------------------------------------------------------
   async function single() {
     if (!(await waitStarted())) return;
+    // The kit builder no longer blanks upstream's placeholder texts ("name", "MehStrongBadMeh ..."): the page's first ""
+    // must reach Unity by itself (portkit f3eaaa1, a TextRef starts unknown).
+    const emptyName = await probeUntil("text", "p2_name", "", (v) => v === "");
+    const rulesLine = await probeUntil("text", "rules", "", (v) => v === "");
+    check(emptyName === "" && rulesLine === "", "the page clears upstream's placeholder texts by itself (an empty station's name, the rules line)", `'${emptyName}', '${rulesLine}'`);
     await sleep(2500);
     const me = debug().me();
     await press(0, "join");
@@ -191,7 +196,8 @@
     await clickKey("creditsPanel", "the credits panel");
     const closed = await probeUntil("active", "creditsPanel", "", (v) => v === "False");
     check(open === "True" && closed === "False", "the credits panel opens and closes", `${open}, ${closed}`);
-    check(table().integrityOk === true, "the page's own check of the referee's result agrees", "");
+    const checked = await until(() => table().integrity !== "pending" && table().integrity, 8000, 200);
+    check(checked === "ok", "the page's own check of the referee's result passes (the dice count it saw, the reveal, the sum)", String(checked));
   }
 
   // ---- two players -------------------------------------------------------------------------------------------
@@ -217,6 +223,16 @@
     }
   };
   const hear = (kind, ms) => until(() => heard.find((m) => m.kind === kind), ms || 60000, 200);
+  /**
+   * Compares the other page's stamp (version and digest of the synced state) with this page's once both are at the same
+   * version: a digest is only comparable between equal versions (portkit 812f285, `stamp()`).
+   */
+  async function sameState(theirs) {
+    if (!theirs) return { ok: false, detail: "no word" };
+    await until(() => debug().stamp().version === theirs.version, 8000, 200);
+    const mine = debug().stamp();
+    return { ok: mine.version === theirs.version && mine.digest === theirs.digest, detail: `${theirs.digest} @ ${theirs.version} / ${mine.digest} @ ${mine.version}` };
+  }
 
   async function multi() {
     const back = reloaded();
@@ -267,13 +283,16 @@
     await sleep(1500);
     const all = (await unityFrames(0)).concat(await unityFrames(1));
     check(JSON.stringify(all.slice(mine * 5, mine * 5 + 5)) === JSON.stringify(myDice), "after the reveal this page's dice are the ones it rolled", JSON.stringify(all));
-    send({ kind: "revealed", frames: all, theirs: myDice, seat: mine, digest: debug().digest() });
+    send({ kind: "revealed", frames: all, theirs: myDice, seat: mine, stamp: debug().stamp() });
     const other = await hear("revealed");
     check(!!other && JSON.stringify(other.frames) === JSON.stringify(all), "both pages show the same ten dice after the reveal", other ? `${JSON.stringify(other.frames)} / ${JSON.stringify(all)}` : "no word");
     check(!!other && JSON.stringify(all.slice(other.seat * 5, other.seat * 5 + 5)) === JSON.stringify(other.theirs), "the other player's revealed dice are the ones that player saw before the challenge", other ? JSON.stringify(other.theirs) : "");
     const sum = all.filter((v) => v === 2 || v === 0).length;
     check(table().resultSum === sum, "the count is the threes and wild ones among the ten dice", `${table().resultSum} / ${sum}`);
-    check(!!other && other.digest === debug().digest(), "both pages hold the same state after the result (digest)", other ? `${other.digest} / ${debug().digest()}` : "");
+    const same1 = await sameState(other && other.stamp);
+    check(same1.ok, "both pages hold the same state after the result (digest at equal version)", same1.detail);
+    const checked = await until(() => table().integrity !== "pending" && table().integrity, 8000, 200);
+    check(checked === "ok", "this page's own check of the referee's result passes", String(checked));
 
     if (!first) {
       // the second player reloads during the result and must come back to its seat
@@ -291,13 +310,15 @@
     }
     // station 1: waits for the reloaded page, then both go on with a Continue
     const backMsg = await hear("back", 120000);
-    check(!!backMsg && backMsg.digest === debug().digest(), "the reloaded page holds the same state as this one (late join by reload)", backMsg ? `${backMsg.digest} / ${debug().digest()}` : "no word from station 2");
+    const same2 = await sameState(backMsg && backMsg.stamp);
+    check(same2.ok, "the reloaded page holds the same state as this one (late join by reload; digest at equal version)", same2.detail);
     const next = await until(() => table().phase === PHASE.Bidding && table().round === 2, 90000, 250);
     check(!!next, "Continue on the reloaded page starts round 2 for both", `phase ${table().phase}, round ${table().round}`);
     await sleep(1500);
-    send({ kind: "round2", digest: debug().digest() });
+    send({ kind: "round2", stamp: debug().stamp() });
     const theirs2 = await hear("round2b", 30000);
-    check(!!theirs2 && theirs2.digest === debug().digest(), "both pages reach the same state digest in round 2", theirs2 ? `${theirs2.digest} / ${debug().digest()}` : "");
+    const same3 = await sameState(theirs2 && theirs2.stamp);
+    check(same3.ok, "both pages reach the same state in round 2 (digest at equal version)", same3.detail);
   }
 
   async function multiAfterReload(me, send) {
@@ -313,7 +334,9 @@
     check(table().phase === PHASE.Result, "and sees the challenge's result (late join)", `phase ${table().phase}`);
     const all = (await unityFrames(0)).concat(await unityFrames(1));
     await sleep(1500);
-    send({ kind: "back", digest: debug().digest(), frames: all });
+    const late = await until(() => table().integrity !== "pending" && table().integrity, 8000, 200);
+    check(late === "ok" || late === "partial", "the reloaded page checks the result as far as it can (it did not see the bidding): no false alarm", String(late));
+    send({ kind: "back", stamp: debug().stamp(), frames: all });
     say("INFO", `the revealed dice after the reload: ${JSON.stringify(all)}`);
     check(all.every((f) => f >= 0 && f <= 7) && all.some((f) => f <= 5), "the revealed dice are drawn after the reload", JSON.stringify(all));
     await until(() => debug().myDice !== undefined, 1000);
@@ -325,9 +348,10 @@
     const want = dice ? dice.concat(new Array(5 - dice.length).fill(7)) : [];
     const frames = await framesUntil(seat, want);
     check(!!dice && JSON.stringify(frames) === JSON.stringify(want), "the reloaded page rolls and sees its own dice in round 2 (a lost die shows the red X)", `${JSON.stringify(frames)} for ${dice ? dice.length : 0} dice`);
+    check(debug().myDiceLost(seat) === false && !plain(table().display).includes("did not come back"), "and its dice are not marked lost", plain(table().display));
     await hear("round2", 30000);
     await sleep(500);
-    send({ kind: "round2b", digest: debug().digest() });
+    send({ kind: "round2b", stamp: debug().stamp() });
   }
 
   window.__ldRun = async function (plan) {
