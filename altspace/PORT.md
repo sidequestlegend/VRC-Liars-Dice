@@ -198,7 +198,10 @@ Done: the rule works as upstream and a test or vector shows it. Changed: it work
 given. Left out: not ported. Kit: belongs to the Unity kit, not to the rules. Tests are in `ts/test/`:
 `golden.test.ts` (V1 to V5 against the upstream C#) and `scenarios.test.ts` (S1 to S11, in file order: full
 game; challenge true and false; ones wild; leaving; late joiner; referee leaves; cheating client; no reveal / no
-roll; two Joins; two tables; rules button and budget).
+roll; two Joins; two tables; rules button and budget; then reload mid-round; seat lost after rejoin-grace; haptics
+side; min-players 1). Fourth pass: `trust.test.ts` (T1 to T10, the review's findings: reload while rolling with no wait;
+the referee reloads; dice that cannot come back; both sides withhold; a referee that marks a die lost; a grinding
+referee; honest checks and a late arrival; the secrecy watch and two leaks it must catch).
 
 **Totals (third pass): 52 done, 9 changed, 2 left out (F01 to F63; F59 now done in the kit); D01 to D16: 12 fixed, 2 kept as upstream, 2 gone or not carried over.**
 
@@ -213,7 +216,7 @@ roll; two Joins; two tables; rules button and budget).
 | F12 | Done | S1: station 1 opens |
 | F13 | Changed | Each player's dice are a fair self-roll (section 3a as built); each face 0 to 5 from SHA-256, 48 bits mod 6 |
 | F14 | Changed | Large or small roll by dice in play, as upstream, at a random pitch 0.9 to 1.1 (`AudioSourceRef.pitch`, relay op `audioPitch`); each die roll is a fair self-roll (F13) |
-| F15 | Done | S1 checks, every round, that each page shows its own faces and "?" for everyone else, and cannot compute anyone else's draw |
+| F15 | Done | S1 checks, every round, that each page shows its own faces and "?" for everyone else, cannot compute anyone else's draw, and holds no die in `dieValues`; T8 watches every message, `dieValues` and every user state on every tick before the challenge (T9, T10 show it catches a leak) |
 | F16, F17 | Done | V5 (3,000 displays against `UpdateText`) |
 | F18, F19, F20, F21 | Done | V3 (10,000 panels against `HighLightButton` and `_Submit`); colours through `uiColor`; the referee re-checks every bid |
 | F22, F23 | Done | V3; S1, S2 |
@@ -335,7 +338,11 @@ self-roll** through the runtime's `Secrets` fair draw, not a commitment to dice 
 (label `<gameId>.<round>`): every seated page calls `beginDraw(label)` (publishes SHA-256 of a 16-byte secret in
 its own user state); the referee answers each commitment with a random number and pins the hash it answered (the
 `fd` table); the dice are `Draw(secret, number, label).Ints(remaining, 6)`, so the player knows them at once and
-nobody else does, and nobody can pick them. On "Call it" the referee calls `demandReveal(label, reveal-timeout)`
+nobody else does. Neither the player nor the referee can pick them: the player's number comes after its commitment,
+and the referee numbers a hash whose secret it does not know; **the referee's own draw** is numbered by a witness (the
+lowest-ranked other participant, portkit `bf8b5c6`), so a modified referee that searches for a number it likes is
+`rejected` everywhere (the review's probe found five 1s accepted before that fix; now test "a modified referee that
+grinds its own number"). What a modified referee can still do is in the trust table below. On "Call it" the referee calls `demandReveal(label, reveal-timeout)`
 and every page seated at the challenge calls `revealDraw(label)`; the referee counts only draws whose state is
 `revealed` (secret matches the pinned hash). A secret changed after the number is `rejected`; no reveal by the
 deadline is `forfeit`; both put the player in `missing`, with the forfeit rules of step 7 below. Bidding opens
@@ -345,6 +352,11 @@ runtime's `fd`/`fr` user-state entries and `fd` table do that); no `taskAck` (th
 do that). **Third pass:** a reload is resumed (N12): the kit saves the draw on the device and moves the referee's entry
 to the new session (G6 fixed in the kit), and the game holds a seated player's seat for `rejoin-grace` seconds
 (default 20) during a game, giving it to the same user's new session (scenario "a seated player reloads ..."). Every client repeats the count from the reveals it sees (`integrityOk`, checked in S1).
+**Fourth pass (2026-11-25, section 12):** a reload never re-rolls (portkit `30881dd`: a new secret under a label the
+user already holds is `rejected`); the station calls `beginDraw` at once (the saved secret is reused, no more 3 s
+wait); a player whose draw cannot come back (a reload on another device) is told on their display and sees the red X on
+their own dice, and is out at the challenge; every client's check of the result counts each seat's dice from what it saw
+during the round and shows a failure on the display (`integrity`).
 
 **Why.** Upstream sends every die to every client (`M:29`) and hides them by drawing "?" (`M:781`). Ported
 as is, all 20 values would sit in public space state where any player can read them from the page console.
@@ -412,7 +424,8 @@ can be written by any client. A player cannot forge another's commitment or open
 
    Valid dice go into `dieValues`. A seat with no valid opening goes into `missing[]`. Then:
    - bidder in `missing`: the bidder forfeits and is out of the game; nobody else loses a die; the
-     challenger bids next;
+     challenger bids next (fourth pass: a challenger who is also in `missing` is out as well, review finding 3; the
+     next seat in order then bids);
    - else challenger in `missing`: the challenger forfeits and is out; the bidder bids next;
    - else `sum = CalcSum()` over the valid seats and the rule of `M:340-371` applies. Other seats in
      `missing` are out of the game and their dice do not count, which is what upstream does with a
@@ -425,25 +438,44 @@ can be written by any client. A player cannot forge another's commitment or open
 
 Every client repeats step 7 for itself from the openings it can see. If its own result differs from the
 referee's, or `commits[]` differs from what it first saw, it logs and shows an "integrity" note. It cannot
-overrule the referee: there is no host and no vote.
+overrule the referee: there is no host and no vote. **As built (fourth pass):** `CheckIntegrity` takes each seat's dice
+count from what the page saw while the round was played (not from the referee's `dieValues`), checks every counted
+seat's dice against its revealed draw, that no seat whose draw is `rejected` or `forfeit` here was counted, that no seat
+with a valid reveal here was put out, the sum, the kind of result, the loser and the dice left. A mismatch sets
+`integrity = "failed"` and adds "Check failed: this result does not match the dice shown" to that page's display. A page
+that arrived after the bidding works the counts back from `remaining` and can at best report `partial`.
 
 Leaving, by phase: lobby, the seat is released (fixes D04). Rolling, the player is removed and step 3 is
 re-tested. Bidding, as upstream (`M:566-574`). Revealing, treated as a missing opening and step 7 is
 re-tested. Result, the player is removed and, if they were to bid next, the next seat in order takes it
 (defines D05).
 
-### What it does and does not protect
+### What it does and does not protect (trust, as built: fourth pass, 2026-11-25)
 
-| | Upstream | Port |
+The first pass's table assumed the plan's scheme (commit to dice the player picked); the game uses the fair self-roll
+(Q1), and the review found the referee missing from the table. As built, on portkit `812f285`. "A modified page" is a
+page whose script a player has changed; nothing here stops a player from doing that.
+
+| What a modified page tries | Upstream (VRChat) | Port: what it can still do, and what stops it |
 |---|---|---|
-| Reading other players' dice | Any client has all 20 values | Nothing but salted hashes exists outside the owner's page until a challenge |
-| Changing your dice after seeing bids | Not possible (the master rolled) | Not possible (hash pinned before the first bid) |
-| Forging another player's dice | Master only | Not possible (relay ties user state to its sender) |
-| **Choosing your own dice** | Not possible | **Possible with a modified page.** A commitment proves the dice did not change; it does not prove they were rolled |
-| Refusing to open | Not applicable | Costs the refuser their place in the game; cannot gain them a die |
-| A dishonest rules client | The master can do anything | The referee can write a false result; other clients notice and say so |
+| Read other players' dice before a challenge | Any client has all 20 values (`M:29`) | **Cannot.** Only SHA-256 commitments of 16-byte secrets travel before the challenge; `dieValues` is all -1 (test "secrecy: ...", which watches every message, every page's `dieValues` and every user state on every tick) |
+| Choose its own dice | Not possible (the master rolled) | **Cannot.** A player's number comes from the referee after its commitment |
+| Change its dice after seeing bids | Not possible | **Cannot.** The commitment is pinned before the number; a changed secret is `rejected` (S7) |
+| Re-roll by reloading (or by a second page) | Not applicable | **Cannot.** A new secret under a label the user already holds gets the first entry back and is `rejected` everywhere (portkit `30881dd`); the page shows the red X on those dice and the player is out at the challenge |
+| Refuse to reveal | Not applicable | Costs the refuser their place; cannot gain a die. Both sides of a challenge refusing puts both out (finding 3) |
+| Forge another player's commitment or reveal | Master only | **Cannot.** The relay ties user state to its sender |
+| **As referee:** choose another player's dice | The master rolled everyone's dice | **Cannot.** It numbers a hash whose secret it does not know |
+| **As referee:** choose its own dice | The master rolled its own dice | **Cannot alone.** A witness numbers the referee's draw (portkit `bf8b5c6`); a number it searched for is `rejected` on every honest page (test "a modified referee that grinds its own number"). **With one accomplice** as its witness it can steer its own draw, and an accomplice can tell it another player's secret |
+| **As referee:** write a false result (wrong count, a die marked lost, a rejected draw counted, the wrong loser, a die taken from the wrong player) | The master can do anything | **Can write it; every other page says so.** Each page repeats the judgement from the reveals and the dice counts it saw itself and shows "Check failed" on its display (tests "a referee that marks a live die lost", "... counts its dice anyway"). Nobody can overrule the referee (no host, no vote); a page that arrived after the bidding can only check part |
+| **As referee:** stall or remove players | The master could | **Can:** refuse to number someone (they are removed at `commit-timeout`), let a reveal deadline pass (forfeit). Visible to all |
+| Take the referee seat | The instance master is VRChat's choice | **Can** under the referee rule `"anyone"` (no server decides who is referee; portkit README) |
+| Overwrite the table's synced fields | Only the owner writes them | Synced fields are public space state: a modified page can overwrite them, as a modified VRChat client can. Every rule is checked by the referee from commands (`CallingPlayer`), and the referee's next write puts the fields back |
 
-**Closing the "choose your own dice" hole** (not in the plan; a decision for the lead, Q1): commit to a
+Limits of the checks (portkit README): a page that arrives after a draw was numbered takes the entries it finds; a witness
+that leaves before its answer reaches a page makes the referee's draw `rejected` there (that page then shows red X on the
+referee's dice and, if the referee counts them, "Check failed": a false alarm in that rare case).
+
+**Closing the "choose your own dice" hole** (first pass; built differently, as the fair self-roll above, Q1): commit to a
 16-byte secret instead of to the dice, and derive the dice from that secret and a round seed nobody
 controls. Each player also commits to a public nonce in step 2 and publishes it after the pin; the seed is
 the hash of all nonces; dice come from HMAC-SHA-256(secret, seed) by the same rejection sampling; the
@@ -727,7 +759,7 @@ build check if the saved kit prefab depends on any upstream file named below as 
 
 | Upstream file | Problem | Done | Source and licence (checked 2026-11-24) |
 |---|---|---|---|
-| `Heavitas.ttf`, `Heavitas SDF.asset`, `Heavitas SDF billboard.asset` | personal-use font | **Replaced, not imported** (the importer skips `.ttf` and `.asset`). Every text is Archivo Black (`Assets/Kit/Fonts/ArchivoBlack SDF.asset`, a static atlas of ASCII, Latin-1 and typographic quotes) with Liberation Sans as fallback | Archivo Black, Omnibus-Type, https://github.com/google/fonts/tree/main/ofl/archivoblack, **SIL OFL 1.1** (`OFL.txt` kept as `Assets/Kit/Fonts/ArchivoBlack-OFL.txt`) |
+| `Heavitas.ttf`, `Heavitas SDF.asset`, `Heavitas SDF billboard.asset` | personal-use font | **Replaced, not imported** (the importer's `skip_files` names them, fourth pass; before, every `.ttf` and `.asset` was skipped by suffix). Every text is Archivo Black (`Assets/Kit/Fonts/ArchivoBlack SDF.asset`, a static atlas of ASCII, Latin-1 and typographic quotes) with Liberation Sans as fallback | Archivo Black, Omnibus-Type, https://github.com/google/fonts/tree/main/ofl/archivoblack, **SIL OFL 1.1** (`OFL.txt` kept as `Assets/Kit/Licenses/ArchivoBlack-OFL.txt`) |
 | `all dice.png`, frame 8 (logo lettered in Heavitas) and frame 6 ("?", font not named) | Heavitas glyphs in a texture | **Redrawn**: `Assets/Kit/Art/dice_atlas.png`, made by `altspace/tools/make_art.py` from the fork's atlas: the "?" inpainted out and lettered again, the logo cell cleared and lettered "LIAR'S DICE" in Archivo Black, white with a black outline. No Heavitas glyph is left | the rest of the atlas is upstream's (MIT) |
 | `all dice normals.png` | no effect upstream | Dropped | |
 | `dice roll large.wav` | needs attribution | **Kept, credited** (notices, credits panel), imported as mono | "dice_06.wav" by dermotte, https://freesound.org/s/220744/, **CC BY 4.0** (licence link read on the page) |
@@ -747,7 +779,15 @@ The Kenney packs were taken from OpenGameArt, where Kenney published them: kenne
 donation page whose download link this session was not allowed to follow automatically.
 
 Textures as imported: table albedo and normal 1024 (Windows) / 512 (Android, ASTC 6x6), metallic 256, dice atlas 1024 /
-512, face sprites 128, button 256 / 128, wild icon 128. Bundles: Android 1,867 KiB, Windows 3,695 KiB.
+512, face sprites 128, button 256 / 128, wild icon 128. Bundles: Android 1,867 KiB, Windows 3,695 KiB (third pass);
+1,888 KiB and 3,724 KiB (fourth pass, with the licence texts packed).
+
+**Fourth pass, licences (review finding 6):** every full licence text the notices name is in `Assets/Kit/Licenses/`
+(packed into both bundles beside the notices): upstream's MIT text, CC BY 4.0 and CC0 1.0 (the legal code, downloaded
+from creativecommons.org on 2026-11-25 into a folder of its own, checked as plain text), the two Kenney licence files and
+Archivo Black's OFL (moved there from `Audio/` and `Fonts/`, `.meta` kept). Liberation Sans, the fallback atlas, now has its
+copyright line in the notices and the credits panel; its OFL text is TextMesh Pro's `LiberationSans - OFL.txt`, which the
+kit tools pack whenever the prefab uses that font (both bundle reports list it).
 
 ---
 

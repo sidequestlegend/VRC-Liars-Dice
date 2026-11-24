@@ -58,6 +58,8 @@ test("three players play a full game to a winner; nobody sees another's dice bef
     const dice = allDice(world, players.filter((p) => seatOfClient(world, p) >= 0));
     // Secrecy: no client can draw anyone else's dice, and no other page knows them.
     for (const viewer of players) {
+      // No die value in synced state before the challenge (the full watch, every tick and every message: trust.test.ts).
+      assert.ok(master(world, viewer).dieValues.every((v) => v === -1), `${viewer.name}: dieValues hold nothing during the bidding`);
       const frames = master(world, viewer).DieFrames();
       const label = master(world, viewer).Label();
       for (const [seat, list] of dice) {

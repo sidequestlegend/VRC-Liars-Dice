@@ -111,10 +111,7 @@ export class PlayerHandle extends Behaviour {
   readonly sounds: string[] = [];
 
   // #region Set Logic (P:79-234)
-  private startedAt = 0;
-
   override Start(): void {
-    this.startedAt = this.Time.time;
     this.NumberCalc(0);
   }
 
@@ -441,16 +438,13 @@ export class PlayerHandle extends Behaviour {
   // #region the station's player rolls and reveals (port, PORT.md section 3a)
 
   /**
-   * A fair self-roll: commit to a secret now; the referee's number turns it into dice. Once per round. A page that has
-   * just been reloaded first gives the runtime a moment to bring back the draw this device saved for the round.
+   * A fair self-roll: commit to a secret now; the referee's number turns it into dice. Once per round, at once: after a
+   * page reload `beginDraw` takes over the secret this device saved for the same round (portkit 30881dd), whether or not
+   * the runtime has read the referee's table yet; a different secret under a label the player already holds would be
+   * refused as a re-roll.
    */
   RollOwnDice(label: string): void {
     if (this.rolledLabel === label) return;
-    if (this.Secrets.drawOf(this.Networking.LocalPlayer.sid, label).state !== "none") {
-      this.rolledLabel = label; // already drawn (restored after a reload)
-      return;
-    }
-    if (this.Time.time - this.startedAt < 3) return;
     this.rolledLabel = label;
     this.Secrets.beginDraw(label);
   }

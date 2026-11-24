@@ -349,10 +349,23 @@ export class LiarsDiceMaster extends Behaviour {
    */
   private minPlayers = 2;
   private readonly absentSince = new Array<number>(SEATS).fill(-1);
-  /** Each client checks the referee's result against the reveals it can see itself (PORT.md 3a, step 7). */
-  integrityOk = true;
+  /**
+   * Each client checks the referee's result against the reveals it can see itself and the dice counts it saw during the
+   * round (PORT.md 3a, step 7): "pending" while reveals may still arrive, "ok" when every counted die and the count
+   * check out, "partial" when some could not be checked (a reveal never reached this page, or it arrived after the
+   * bidding and did not see the counts), "failed" when something does not match. A failure is shown on the display.
+   */
+  integrity: "pending" | "ok" | "partial" | "failed" = "ok";
+  get integrityOk(): boolean {
+    return this.integrity !== "failed";
+  }
   private checkedContest = -1;
+  private checkingContest = -1;
   private resultSeenAt = -1;
+  /** The dice count of each seat this page saw while the round was being played (`<gameId>.<round>`), for the check. */
+  private seenCounts: { round: string; counts: number[] } | null = null;
+  /** Seats whose dice this page shows as void (red X) during the round, as last drawn: a change redraws them. */
+  private voidSeats = "";
   /** Sounds this client played on the table speaker, by name (for tests). */
   readonly sounds: string[] = [];
   /** Lines this client showed on the display, in order (for tests). */
@@ -622,6 +635,8 @@ export class LiarsDiceMaster extends Behaviour {
       this.resultLoser = bidder;
       this.resultEliminated = true;
       this.ForfeitSeat(bidder);
+      // A challenger who also withheld is out as well (review finding 3): withholding never escapes the forfeit.
+      if (missing[challenger] && challenger !== bidder) this.ForfeitSeat(challenger);
       this.postContestTurn = true;
       this.postContestTurnPlayer = challenger;
       this.currentDie = -1;
@@ -844,8 +859,10 @@ export class LiarsDiceMaster extends Behaviour {
 
   override Update(): void {
     if (this.phase === Phase.Result) this.CheckIntegrity();
+    else if (this.phase === Phase.Bidding || this.phase === Phase.Revealing) this.WatchVoidSeats();
     this.LocalDuties();
     if (!this.Networking.IsOwner(this.gameObject)) return;
+    this.PublishDrawTable();
     this.Reconcile();
     if (this.phase === Phase.Rolling) this.CheckCommits();
     else if (this.phase === Phase.Revealing) this.CheckReveals();
@@ -953,36 +970,158 @@ export class LiarsDiceMaster extends Behaviour {
     return draw ? draw.Ints(this.remaining[seat]!, 6) : null;
   }
 
-  /** Each client repeats the count from the reveals it can see; a referee that wrote something else is noticed. */
+  /**
+   * Each client repeats the referee's judgement from what it can see itself (review finding 4): every seat's dice from
+   * its revealed draw, with the dice count this page saw during the round (not the count the referee's `dieValues`
+   * implies); a seat counted although its draw is rejected or forfeit here; a seat put out although its valid reveal is
+   * here; the sum, the kind of result, the loser and the dice left. A mismatch is shown on the display. A page cannot
+   * overrule the referee (there is no host and no vote); it can only tell its player.
+   */
   private CheckIntegrity(): void {
     if (this.checkedContest === this.contestSeq) return;
-    if (this.resultSeenAt < 0) this.resultSeenAt = this.Time.time;
+    if (this.checkingContest !== this.contestSeq) {
+      this.checkingContest = this.contestSeq;
+      this.resultSeenAt = this.Time.time;
+      this.integrity = "pending";
+    }
+    const late = this.Time.time - this.resultSeenAt >= 5; // reveals that have not arrived by now are not coming
     const label = this.Label();
+    const sawRound = this.seenCounts !== null && this.seenCounts.round === label;
+    const failures: string[] = [];
+    let unverified = !sawRound;
+    let waiting = false;
     const values = new Array<number>(SEATS * DICE_PER_SEAT).fill(-1);
     let complete = true;
     for (let s = 0; s < SEATS; s++) {
-      if (this.contestPlayers[s] === -1 || this.resultOut[s]) continue;
-      const player = this.Networking.GetPlayerById(this.contestPlayers[s]!);
+      const id = this.contestPlayers[s]!;
+      if (id === -1) continue;
+      const player = this.Networking.GetPlayerById(id);
       const status = player ? this.Secrets.drawOf(player.sid, label) : null;
-      if (!status || status.state !== "revealed" || !status.draw) {
-        complete = false;
+      const state = status ? status.state : "none";
+      const shown = this.dieValues.slice(s * DICE_PER_SEAT, (s + 1) * DICE_PER_SEAT);
+      // The dice count: what this page saw while the round was played; a page that arrived after it can only work back
+      // from the referee's `remaining` (the loser has one die fewer).
+      const n = sawRound ? this.seenCounts!.counts[s]! : this.remaining[s]! + (this.resultKind === 0 && s === this.resultLoser ? 1 : 0);
+      if (this.resultOut[s]) {
+        if (shown.some((v) => v >= 0 && v <= 5)) failures.push(`seat ${s + 1} is out but its dice are shown`);
+        if (state === "revealed") {
+          if (late) failures.push(`seat ${s + 1} is out although its reveal is valid here`);
+          else waiting = true; // the runtime's own forfeit mark may still be on its way
+        }
+        if (sawRound && this.remaining[s] !== 0) failures.push(`seat ${s + 1} is out but keeps ${this.remaining[s]} dice`);
         continue;
       }
-      let count = 0;
-      for (let k = 0; k < DICE_PER_SEAT; k++) if (this.dieValues[s * DICE_PER_SEAT + k]! <= 5) count++;
-      const dice = status.draw.Ints(count, 6);
+      if (state === "rejected" || state === "forfeit") {
+        failures.push(`seat ${s + 1} is counted although its draw is ${state} here`);
+        continue;
+      }
+      if (state !== "revealed" || !status?.draw) {
+        complete = false;
+        if (late) unverified = true;
+        else waiting = true;
+        continue;
+      }
+      const dice = status.draw.Ints(n, 6);
+      for (let k = 0; k < DICE_PER_SEAT; k++) {
+        const expected = k < n ? dice[k]! : FRAME_LOST;
+        if (shown[k] !== expected) {
+          failures.push(`seat ${s + 1} die ${k + 1} shows ${shown[k]}, its reveal says ${expected}`);
+          break;
+        }
+      }
       for (let k = 0; k < dice.length; k++) values[s * DICE_PER_SEAT + k] = dice[k]!;
-      for (let k = 0; k < dice.length; k++) if (this.dieValues[s * DICE_PER_SEAT + k] !== dice[k]) this.integrityOk = false;
+      if (sawRound) {
+        const left = this.resultKind === 0 && s === this.resultLoser ? n - 1 : n;
+        if (this.remaining[s] !== left && !(left === 0 && this.remaining[s] === 0)) failures.push(`seat ${s + 1} has ${this.remaining[s]} dice left, not ${left}`);
+      }
     }
-    if (!complete && this.Time.time - this.resultSeenAt < 5) return;
+    // The kind of result follows from who is out; the loser from the kind and the count.
+    const bidderOut = this.bidder >= 0 && this.resultOut[this.bidder] === true;
+    const challengerOut = this.challenger >= 0 && this.resultOut[this.challenger] === true;
+    const kind = bidderOut ? 1 : challengerOut ? 2 : 0;
+    if (kind !== this.resultKind) failures.push(`the result is of kind ${this.resultKind}, the seats out make it ${kind}`);
     if (complete && this.resultKind === 0) {
       let sum = 0;
       for (const v of values) if (v >= 0 && (v === this.resultDie || (this.resultWild && v === 0))) sum++;
-      if (sum !== this.resultSum) this.integrityOk = false;
+      if (sum !== this.resultSum) failures.push(`the count is ${sum}, the referee wrote ${this.resultSum}`);
+      const loser = this.resultMulti > sum ? this.bidder : this.challenger;
+      if (loser !== this.resultLoser) failures.push(`the loser is seat ${loser + 1}, the referee wrote seat ${this.resultLoser + 1}`);
+    } else if (this.resultKind !== 0 && this.resultLoser !== (this.resultKind === 1 ? this.bidder : this.challenger)) {
+      failures.push(`the loser of a forfeit is seat ${this.resultLoser + 1}`);
     }
-    if (!this.integrityOk) this.Debug.LogWarning(`integrity: the result of challenge ${this.contestSeq} does not match the revealed dice`);
+    if (failures.length) {
+      this.integrity = "failed";
+      this.Debug.LogWarning(`integrity: the result of challenge ${this.contestSeq} does not match what this page saw: ${failures.join("; ")}`);
+    } else if (waiting) {
+      return; // look again next tick
+    } else {
+      this.integrity = unverified || !complete ? "partial" : "ok";
+    }
     this.checkedContest = this.contestSeq;
-    this.resultSeenAt = -1;
+    this.UpdateText("Liar's Dice");
+  }
+
+  /** What this page sees of the round while it is played (for CheckIntegrity): each seat's dice count. */
+  private SeeRound(): void {
+    if (!this.gameStarted || (this.phase !== Phase.Rolling && this.phase !== Phase.Bidding && this.phase !== Phase.Revealing)) return;
+    const counts = new Array<number>(SEATS).fill(0);
+    for (let s = 0; s < SEATS; s++) if (this.currentPlayers[s] !== -1) counts[s] = Math.max(0, Math.min(DICE_PER_SEAT, this.remaining[s]!));
+    this.seenCounts = { round: this.Label(), counts };
+  }
+
+  /**
+   * True when the local player sits at `seat` and the draw of this round is gone for them: rejected or forfeit, or never
+   * made on this page with no saved draw coming back (a reload on another device, or after the device forgot it). Their
+   * dice will count for nothing and they are out at the challenge; the page tells them (review finding 2).
+   */
+  MyDiceLost(seat: number): boolean {
+    if (!this.gameStarted || (this.phase !== Phase.Bidding && this.phase !== Phase.Revealing)) return false;
+    if (this.currentPlayers[seat] !== this.LocalPlayerId()) return false;
+    const label = this.Label();
+    const state = this.Secrets.drawOf(this.Networking.LocalPlayer.sid, label).state;
+    if (state === "rejected" || state === "forfeit") return true;
+    return state === "none" && !this.Secrets.hasSavedDraw(label);
+  }
+
+  /** A seat whose dice this page shows as void during the round: the local player's lost draw, or a draw rejected here. */
+  private SeatVoid(seat: number): boolean {
+    if (!this.gameStarted || (this.phase !== Phase.Bidding && this.phase !== Phase.Revealing)) return false;
+    const id = this.currentPlayers[seat]!;
+    if (id === -1) return false;
+    if (id === this.LocalPlayerId()) return this.MyDiceLost(seat);
+    const player = this.Networking.GetPlayerById(id);
+    if (!player) return false;
+    const state = this.Secrets.drawOf(player.sid, this.Label()).state;
+    return state === "rejected" || state === "forfeit";
+  }
+
+  /** Redraws dice and display when the set of void seats changes (draw states change without a state write). */
+  private WatchVoidSeats(): void {
+    let key = "";
+    for (let s = 0; s < SEATS; s++) key += this.SeatVoid(s) ? "1" : "0";
+    if (key === this.voidSeats) return;
+    this.voidSeats = key;
+    this.UpdateMesh();
+    this.UpdateText("Liar's Dice");
+  }
+
+  /**
+   * Workaround for a kit gap (reported; portkit `secrets.ts` officiate and `refrecord.ts`): a new referee carries on the
+   * previous referee's number table but publishes it only when an entry changes. A page that starts in between (a
+   * reload, typically of the referee that just left) reads an empty table: its saved draw cannot come back, and every
+   * entry numbered before looks new to it, so a witnessed entry is judged as the referee's own and rejected. The game's
+   * referee publishes the table it carries as soon as it is the referee. Remove once the kit does this itself.
+   */
+  private PublishDrawTable(): void {
+    const secrets = this.Secrets as unknown as {
+      numbers?: { working(): Record<string, unknown>; write(table: Record<string, unknown>): void };
+      presence?: { localSid: string; extra(sid: string, name: string): unknown };
+    };
+    const numbers = secrets.numbers;
+    const presence = secrets.presence;
+    if (!numbers || !presence || presence.extra(presence.localSid, "fn") !== undefined) return;
+    const table = numbers.working();
+    if (Object.keys(table).length) numbers.write(table);
   }
   // #endregion
 
@@ -1015,6 +1154,7 @@ export class LiarsDiceMaster extends Behaviour {
     this.onesWildStateVisual?.SetActive(this.onesWild);
     if (this.Networking.IsOwner(this.gameObject)) this.SetOnesWild();
     this.diceLeft = this.CountDiceLeft(); // D07: counted before the panels use it
+    this.SeeRound();
     this.UpdateUIState();
     this.UpdateText("Liar's Dice");
     this.UpdateMesh();
@@ -1086,6 +1226,12 @@ export class LiarsDiceMaster extends Behaviour {
       text += onesLine();
     }
     if (!this.gameStarted && this.lastWinner !== -1) text = name(this.lastWinnerName) + this.white + " is the Winner";
+    // Port lines, for this page only: its player's dice are gone (review finding 2), or the result fails its check (finding 4).
+    const me = this.LocalPlayerId();
+    for (let s = 0; s < SEATS; s++) {
+      if (this.currentPlayers[s] === me && this.MyDiceLost(s)) text += "\n<color=#FF6060>Your dice did not come back with the reload:\nyou are out at the challenge</color>";
+    }
+    if (this.gameStarted && this.phase === Phase.Result && this.integrity === "failed") text += "\n<color=#FF6060>Check failed: this result does not match the dice shown</color>";
     return text;
   }
 
@@ -1103,7 +1249,7 @@ export class LiarsDiceMaster extends Behaviour {
       text = name(this.resultLoser) + this.white + " did not show their dice:\n Bid: " + bid + "\n" + name(this.resultLoser) + this.white + " has been eliminated";
     }
     for (let s = 0; s < SEATS; s++) {
-      if (this.resultOut[s] && s !== this.bidder && s !== this.challenger) text += "\n" + name(s) + this.white + " did not show their dice and has been eliminated";
+      if (this.resultOut[s] && s !== this.resultLoser) text += "\n" + name(s) + this.white + " did not show their dice and has been eliminated";
     }
     return text;
   }
@@ -1118,6 +1264,7 @@ export class LiarsDiceMaster extends Behaviour {
   DieFrames(): Array<{ frame: number; cyan: boolean }> {
     const out: Array<{ frame: number; cyan: boolean }> = [];
     const mine = new Map<number, number[] | null>();
+    const voids = new Map<number, boolean>();
     for (let i = 0; i < this.dieValues.length; i++) {
       const playerNum = Math.trunc(i / DICE_PER_SEAT);
       if (this.phase === Phase.Result && this.gameStarted) {
@@ -1131,6 +1278,11 @@ export class LiarsDiceMaster extends Behaviour {
         continue;
       }
       if ((i % DICE_PER_SEAT) + 1 <= this.remaining[playerNum]!) {
+        if (!voids.has(playerNum)) voids.set(playerNum, this.SeatVoid(playerNum));
+        if (voids.get(playerNum)) {
+          out.push({ frame: FRAME_LOST, cyan: false }); // a void draw: these dice count for nothing (review finding 2)
+          continue;
+        }
         if (!mine.has(playerNum)) mine.set(playerNum, this.gameStarted ? this.MyDice(playerNum) : null);
         const dice = mine.get(playerNum);
         out.push({ frame: dice ? dice[i % DICE_PER_SEAT]! : FRAME_UNKNOWN, cyan: false });
