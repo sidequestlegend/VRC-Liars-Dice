@@ -90,6 +90,16 @@
     return out;
   }
 
+  /** unityFrames, again until it equals `want` (the relay lands a tick or two after the page's state), up to `ms`. */
+  async function framesUntil(seat, want, ms) {
+    const end = Date.now() + (ms || 5000);
+    for (;;) {
+      const f = await unityFrames(seat);
+      if (JSON.stringify(f) === JSON.stringify(want) || Date.now() > end) return f;
+      await sleep(200);
+    }
+  }
+
   async function waitStarted(back) {
     const ok = await until(() => debug() && debug().table, 120000, 250);
     check(!!ok, "the kit loads from a hand-written bs-snippet and the instance starts", ok ? "" : "no debug hooks after 120 s");
@@ -140,9 +150,9 @@
     const bidding = await until(() => table().phase === PHASE.Bidding, 30000, 200);
     check(!!bidding && table().playing === 0, "Start Game: the dice are rolled (fair draw) and station 1 opens the bidding", `phase ${table().phase}, playing ${table().playing}`);
     const dice = debug().myDice(0);
-    const frames = await unityFrames(0);
+    const frames = await framesUntil(0, dice);
     check(!!dice && JSON.stringify(frames) === JSON.stringify(dice), "the player's own dice show their faces in Unity (relay op matFloat, URP flipbook shader)", `dice ${JSON.stringify(dice)}, frames ${JSON.stringify(frames)}`);
-    const empty = await unityFrames(2);
+    const empty = await framesUntil(2, [8, 8, 8, 8, 8]);
     check(empty.every((f) => f === 8), "the dice of an empty station show the logo", JSON.stringify(empty));
     const opening = plain(await probeUntil("text", "display", "", (v) => plain(v).includes("starts the round")));
     check(opening === `${me.name}\n starts the round\nOnes are Wild`, "the display says who starts the round", JSON.stringify(opening));
@@ -168,7 +178,7 @@
     const counts = dice[0] === 3 || dice[0] === 0;
     check(tint === (counts ? "0.000 1.000 1.000 1.000" : "1.000 1.000 1.000 1.000"), "a counting die is tinted cyan, the others white (relay op color)", `${tint} for a ${dice[0] + 1}`);
     check((await probe("active", "p1_continue")) === "True", "Continue shows", "");
-    await cmd("shot single_result 0 1.6 -0.9 0 0.85 0 60");
+    await cmd("shot single_result 0.9 1.7 0.2 0 0.85 1.3 55");
 
     // rules line and credits: local, through the same input path
     await press(0, "rules");
@@ -236,8 +246,8 @@
     check(!!bidding && table().seats[mine] === me.id && table().seats[theirs] !== -1, "both players are seated and the round starts", JSON.stringify(table().seats));
     // before the challenge: my dice visible in Unity, theirs "?" (frame 6); this page cannot compute theirs
     const myDice = debug().myDice(mine);
-    const myFrames = await unityFrames(mine);
-    const theirFrames = await unityFrames(theirs);
+    const myFrames = await framesUntil(mine, myDice);
+    const theirFrames = await framesUntil(theirs, [6, 6, 6, 6, 6]);
     check(!!myDice && JSON.stringify(myFrames) === JSON.stringify(myDice), "before the challenge this page shows its own dice", JSON.stringify(myFrames));
     check(theirFrames.every((f) => f === 6) && debug().myDice(theirs) === null, "and only '?' for the other player's dice (it does not know them)", JSON.stringify(theirFrames));
 
@@ -312,8 +322,9 @@
     const next = await until(() => table().phase === PHASE.Bidding && table().round === 2, 90000, 250);
     check(!!next, "Continue (pressed on the reloaded page) starts round 2", `phase ${table().phase}, round ${table().round}`);
     const dice = debug().myDice(seat);
-    const frames = await unityFrames(seat);
-    check(!!dice && JSON.stringify(frames) === JSON.stringify(dice), "the reloaded page rolls and sees its own dice in round 2", JSON.stringify(frames));
+    const want = dice ? dice.concat(new Array(5 - dice.length).fill(7)) : [];
+    const frames = await framesUntil(seat, want);
+    check(!!dice && JSON.stringify(frames) === JSON.stringify(want), "the reloaded page rolls and sees its own dice in round 2 (a lost die shows the red X)", `${JSON.stringify(frames)} for ${dice ? dice.length : 0} dice`);
     await hear("round2", 30000);
     await sleep(500);
     send({ kind: "round2b", digest: debug().digest() });

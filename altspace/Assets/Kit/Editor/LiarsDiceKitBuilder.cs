@@ -237,6 +237,16 @@ namespace LiarsDice
                 text.fontSharedMaterial = font.material;
                 text.richText = true;
             }
+            // What the page shows first. The runtime's TextRef starts as "" and sends nothing for "", so a text the game
+            // first sets to "" would keep upstream's placeholder ("MehStrongBadMeh ...", "name", "#"): blank them here.
+            Transform F(string path) => set.transform.Find(path) ?? throw new Exception($"no '{path}'");
+            F("billboard display/Text (TMP)").GetComponent<TMP_Text>().text = "Liar's Dice";
+            F("billboard display/Text rules").GetComponent<TMP_Text>().text = "";
+            foreach (var p in Stations)
+            {
+                F($"master script/{p}/Canvas/name display").GetComponent<TMP_Text>().text = "";
+                F($"master script/{p}/Canvas/InGame/+&-/result").GetComponent<TMP_Text>().text = "1";
+            }
         }
 
         static void Key(KitStage stage, GameObject go, string key)
@@ -362,17 +372,23 @@ namespace LiarsDice
         {
             Directory.CreateDirectory(AnimationFolder);
             string path = AnimationFolder + "/UIEffect.controller";
-            AssetDatabase.DeleteAsset(path);
-            if (!AssetDatabase.CopyAsset(UpstreamController, path)) throw new Exception("could not copy the UIEffect controller");
+            // made once and then kept (same GUIDs from build to build); its states point at the kit's clips after the first build
+            if (AssetDatabase.LoadAssetAtPath<AnimatorController>(path) == null && !AssetDatabase.CopyAsset(UpstreamController, path))
+                throw new Exception("could not copy the UIEffect controller");
             var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(path);
             foreach (var layer in controller.layers)
                 foreach (var child in layer.stateMachine.states)
                 {
                     if (!(child.state.motion is AnimationClip clip)) continue;
                     string clipPath = $"{AnimationFolder}/{clip.name}.anim";
-                    AssetDatabase.DeleteAsset(clipPath);
-                    var copy = Object.Instantiate(clip);
-                    copy.name = clip.name;
+                    // the kit's copy is made once and then corrected in place (SetEditorCurve keeps the clip's runtime bindings current)
+                    var copy = AssetDatabase.LoadAssetAtPath<AnimationClip>(clipPath);
+                    if (copy == null)
+                    {
+                        copy = Object.Instantiate(clip);
+                        copy.name = clip.name;
+                        AssetDatabase.CreateAsset(copy, clipPath);
+                    }
                     foreach (var binding in AnimationUtility.GetCurveBindings(copy))
                     {
                         if (binding.path.EndsWith("/selector", StringComparison.Ordinal)) continue;
@@ -381,7 +397,7 @@ namespace LiarsDice
                         float value = binding.propertyName.EndsWith("x", StringComparison.Ordinal) ? target.localPosition.x : target.localPosition.y;
                         AnimationUtility.SetEditorCurve(copy, binding, AnimationCurve.Constant(0f, 0f, value));
                     }
-                    AssetDatabase.CreateAsset(copy, clipPath);
+                    EditorUtility.SetDirty(copy);
                     child.state.motion = copy;
                 }
             EditorUtility.SetDirty(controller);
