@@ -1,0 +1,9 @@
+{
+  "source": "..",
+  "destination": "Assets/Upstream",
+  "roots": ["Assets/LiarsDice"],
+  "skip_suffixes": [".cs", ".asmdef", ".asmref", ".dll", ".unity", ".blend", ".blend1", ".ttf", ".asset", ".shader", ".cginc"],
+  "skip_dirs": ["editor", "Editor", ".git", "Library", "Temp", "altspace"],
+  "copy_files": ["LICENSE.md"],
+  "notice": "VRC Liars Dice by akalink (Garrett McPherson), MIT, https://github.com/akalink/VRC-Liars-Dice. Not imported: the Heavitas font and its TMP assets (personal-use licence), the built-in-pipeline shaders, the compiled Udon programs."
+}
