@@ -1,5 +1,8 @@
 # Liar's dice: port analysis
 
+Status (2026-11-25, fourth pass): re-synced to portkit `812f285`; every finding of the independent review fixed or
+stated (section 12); rungs 0 to 4 passed again on the rebuilt bundles.
+
 Status (2026-11-24, third pass): **the kit is built and the editor rungs are run** (section 11, evidence in
 `TESTS.md`). The rules were re-synced to the fixed portkit (every runtime gap of section 10 is closed in the kit;
 `ts/src/gaps.ts` is gone), the Unity project `altspace/` builds the kit with `Assets/Kit/Editor/LiarsDiceKitBuilder.cs`,
@@ -1067,7 +1070,7 @@ New snippet settings: `rejoin-grace` (20 s; the seat is held for a reloading pla
 
 ### Rungs (evidence in `TESTS.md`)
 
-Rung 0/1: `npm test` 21 of 21 (typecheck, lint, golden vectors V1 to V5, 16 scenarios). Rung 2: `PortKit/Kit/Check` PASS
+Third pass: rung 0/1: `npm test` 21 of 21 (typecheck, lint, golden vectors V1 to V5, 16 scenarios). Rung 2: `PortKit/Kit/Check` PASS
 (0 disallowed graph nodes, 187 bindings resolve, Android 1,867 KiB and Windows 3,695 KiB bundles PASS BundleChecker) and
 `PortKit/Liars Dice/Check Licences` PASS. Rung 3: 22 of 22 in Play mode. Rung 4: 39 of 39 with two Local Multiplayer
 players, reload included. Artifacts exported to `altspace/dist/`.
@@ -1137,3 +1140,11 @@ this epoch but a last table from a previous referee exists (use that one).
   portkit README): it shows red X on the referee's dice and, at the challenge, "Check failed". Rare; a new round clears it.
 - Bid values in the result (`resultMulti`, `resultDie`) are not checked against the bids a page saw: the relay may merge
   state writes, so a page cannot be sure it saw the last bid; the bid is shown on every display during the bidding.
+
+### Rungs after the fourth pass (evidence in `TESTS.md`)
+
+Rung 0/1: `npm test` 31 of 31 (typecheck, lint clean; golden vectors, 15 scenarios, 10 trust tests), three runs in a row.
+Rung 2: Build Prefabs, Build Bundles, `PortKit/Kit/Check` PASS twice (0 disallowed graph nodes, 187 bindings resolve, hash
+unchanged; bundles PASS BundleChecker with the notices and seven licence texts: Android 1,888 KiB, Windows 3,724 KiB, were
+1,867 and 3,695), `PortKit/Liars Dice/Check Licences` PASS. Rung 3: 23 of 23, twice in a row. Rung 4: 43 of 43, twice in a
+row (stamps compared at equal versions; each page's result check `ok`, the reloaded page's `partial`). Artifacts exported.
