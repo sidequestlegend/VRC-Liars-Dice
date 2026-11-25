@@ -16,6 +16,14 @@ portkit/tools/remote.sh altspace menu "PortKit/Multiplayer/Activate Player 2"
 portkit/tools/playtest.sh altspace altspace/playtest/multi.json liars-dice   rung 4
 ```
 
+## Page script on portkit 552622c, 2026-11-25 evening
+
+Re-synced `ts/portkit` and the package to portkit `552622c`. That commit includes `425bd55`: the page loads kit
+items one at a time, because overlapping loads lost relay graphs and Variables in the app. It also includes
+`0880bf5`: a referee claimant starts only once its claim has stood for 1.5 s, which fixes the equal-term double
+claim, and user-state flushes go one at a time. The bundles are unchanged from the rebuild below. `npm test`:
+**31 of 31** (0 failed). `npm run build`: 448643 bytes. Export Artifacts -> `dist/`: 12 files (7 licence texts), footprint 1.6 x 1.43 x 1.6 m, bindings ba1dd43fa12436841c6b7677c39e7d3ede94d00f.
+
 ## Canvas colliders, 2026-11-25 evening (portkit 476075d)
 
 In world 9d7311 the SDK's `BSKitItem` gave every world-space canvas without a BoxCollider a solid one when the kit
