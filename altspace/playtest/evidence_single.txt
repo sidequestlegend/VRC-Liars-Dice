@@ -43,16 +43,16 @@ local: script and bundles from the test server http://localhost:42900
 [main] INFO click p1 start: ok screen 585,512 of 1169x1024
 [main] PASS Start Game: the dice are rolled (fair draw) and station 1 opens the bidding: phase 2, playing 0
 [main] CMD k17 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(0) _frame
-[main] REPLY k17 1.000
+[main] REPLY k17 0.000
 [main] CMD k18 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(1) _frame
-[main] REPLY k18 1.000
+[main] REPLY k18 4.000
 [main] CMD k19 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(2) _frame
-[main] REPLY k19 1.000
+[main] REPLY k19 5.000
 [main] CMD k20 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(3) _frame
-[main] REPLY k20 2.000
+[main] REPLY k20 4.000
 [main] CMD k21 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(4) _frame
-[main] REPLY k21 0.000
-[main] PASS the player's own dice show their faces in Unity (relay op matFloat, URP flipbook shader): dice [1,1,1,2,0], frames [1,1,1,2,0]
+[main] REPLY k21 3.000
+[main] PASS the player's own dice show their faces in Unity (relay op matFloat, URP flipbook shader): dice [0,4,5,4,3], frames [0,4,5,4,3]
 [main] CMD k22 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p3/dice%20(0) _frame
 [main] REPLY k22 8.000
 [main] CMD k23 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p3/dice%20(1) _frame
@@ -77,79 +77,79 @@ local: script and bundles from the test server http://localhost:42900
 [main] REPLY k30 ok screen 585,512 of 1169x1024
 [main] INFO click p1 four: ok screen 585,512 of 1169x1024
 [main] CMD k31 probe pk1:liars-dice:0 uicolor LiarsDiceTable/master%20script/p1/Canvas/InGame/Num%20Selection/four
-[main] REPLY k31 0.000 1.000 1.000 1.000
+[main] REPLY k31 1.000 1.000 1.000 1.000
+[main] CMD k32 probe pk1:liars-dice:0 uicolor LiarsDiceTable/master%20script/p1/Canvas/InGame/Num%20Selection/four
+[main] REPLY k32 0.000 1.000 1.000 1.000
 [main] PASS the picked face button turns cyan (relay op uiColor), seat 1: 0.000 1.000 1.000 1.000
-[main] CMD k32 probe pk1:liars-dice:0 pos LiarsDiceTable/master%20script/p1/Canvas/InGame/+&-/+/selector
-[main] REPLY k32 -0.090 0.884 0.748
-[main] CMD k33 look -0.090 0.884 0.748
-[main] REPLY k33 ok camera at 0.00,1.60,0.00
-[main] CMD k34 click -0.090 0.884 0.748
-[main] REPLY k34 ok screen 585,512 of 1169x1024
+[main] CMD k33 probe pk1:liars-dice:0 pos LiarsDiceTable/master%20script/p1/Canvas/InGame/+&-/+/selector
+[main] REPLY k33 -0.090 0.884 0.748
+[main] CMD k34 look -0.090 0.884 0.748
+[main] REPLY k34 ok camera at 0.00,1.60,0.00
+[main] CMD k35 click -0.090 0.884 0.748
+[main] REPLY k35 ok screen 585,512 of 1169x1024
 [main] INFO click p1 plus: ok screen 585,512 of 1169x1024
-[main] CMD k35 probe pk1:liars-dice:0 text LiarsDiceTable/master%20script/p1/Canvas/InGame/+&-/result
-[main] REPLY k35 1
 [main] CMD k36 probe pk1:liars-dice:0 text LiarsDiceTable/master%20script/p1/Canvas/InGame/+&-/result
-[main] REPLY k36 2
+[main] REPLY k36 1
+[main] CMD k37 probe pk1:liars-dice:0 text LiarsDiceTable/master%20script/p1/Canvas/InGame/+&-/result
+[main] REPLY k37 2
 [main] PASS the quantity on the panel reads 2: 2
-[main] CMD k37 probe pk1:liars-dice:0 pos LiarsDiceTable/master%20script/p1/Canvas/InGame/Submit/selector
-[main] REPLY k37 0.000 0.864 0.625
-[main] CMD k38 look 0.000 0.864 0.625
-[main] REPLY k38 ok camera at 0.00,1.60,0.00
-[main] CMD k39 click 0.000 0.864 0.625
-[main] REPLY k39 ok screen 585,512 of 1169x1024
+[main] CMD k38 probe pk1:liars-dice:0 pos LiarsDiceTable/master%20script/p1/Canvas/InGame/Submit/selector
+[main] REPLY k38 0.000 0.864 0.625
+[main] CMD k39 look 0.000 0.864 0.625
+[main] REPLY k39 ok camera at 0.00,1.60,0.00
+[main] CMD k40 click 0.000 0.864 0.625
+[main] REPLY k40 ok screen 585,512 of 1169x1024
 [main] INFO click p1 submit: ok screen 585,512 of 1169x1024
 [main] PASS the bid 2 X 4 is made through the panel buttons: 2 X 4
-[main] CMD k40 probe pk1:liars-dice:0 text LiarsDiceTable/billboard%20display/Text%20(TMP)
-[main] REPLY k40 <color=#FFFF00>Main Editor's<color=#FFFFFF> turn
+[main] CMD k41 probe pk1:liars-dice:0 text LiarsDiceTable/billboard%20display/Text%20(TMP)
+[main] REPLY k41 <color=#FFFF00>Main Editor's<color=#FFFFFF> turn
 [main] ie
 [main] e Wild
 [main] PASS the bid display in Unity reads the bid: "Main Editor's turn\n2 X 4 die\nOnes are Wild"
 [main] PASS the turn comes back to the only player, the quantity starts at the standing bid: {"yourTurn":true,"multiNum":2,"dieNumber":3,"min":2,"max":5,"colors":{"faces":["white","white","white","cyan","white","white"],"others":["white","gray","gray","white"]}}
-[main] CMD k41 probe pk1:liars-dice:0 pos LiarsDiceTable/master%20script/p1/Canvas/InGame/Call%20it/selector
-[main] REPLY k41 -0.070 0.893 0.813
-[main] CMD k42 look -0.070 0.893 0.813
-[main] REPLY k42 ok camera at 0.00,1.60,0.00
-[main] CMD k43 click -0.070 0.893 0.813
-[main] REPLY k43 ok screen 585,512 of 1169x1024
+[main] CMD k42 probe pk1:liars-dice:0 pos LiarsDiceTable/master%20script/p1/Canvas/InGame/Call%20it/selector
+[main] REPLY k42 -0.070 0.893 0.813
+[main] CMD k43 look -0.070 0.893 0.813
+[main] REPLY k43 ok camera at 0.00,1.60,0.00
+[main] CMD k44 click -0.070 0.893 0.813
+[main] REPLY k44 ok screen 585,512 of 1169x1024
 [main] INFO click p1 callIt: ok screen 585,512 of 1169x1024
-[main] PASS Call it: the dice are revealed and counted (fours and wild ones): sum 1, expected 1
-[main] CMD k44 probe pk1:liars-dice:0 text LiarsDiceTable/billboard%20display/Text%20(TMP)
-[main] REPLY k44 <color=#FFFF00>Main Editor's<color=#FFFFFF> turn
+[main] PASS Call it: the dice are revealed and counted (fours and wild ones): sum 2, expected 2
+[main] CMD k45 probe pk1:liars-dice:0 text LiarsDiceTable/billboard%20display/Text%20(TMP)
+[main] REPLY k45 <color=#FFFF00>Main Editor's<color=#FFFFFF> turn
 [main] ie
 [main] e Wild
-[main] CMD k45 probe pk1:liars-dice:0 text LiarsDiceTable/billboard%20display/Text%20(TMP)
-[main] REPLY k45 <color=#FFFF00>Main Editor<color=#FFFFFF> is a liar:
+[main] CMD k46 probe pk1:liars-dice:0 text LiarsDiceTable/billboard%20display/Text%20(TMP)
+[main] REPLY k46 <color=#FFFF00>Main Editor<color=#FFFFFF> is not a liar:
 [main]  X 4 die
-[main]  1 X 4 die
+[main]  2 X 4 die
 [main] #FFFF00>Main Editor<color=#FFFFFF> losses a dice
-[main] PASS the result shows on the display: "Main Editor is a liar:\n Bid: 2 X 4 die\n Actual 1 X 4 die\nMain Editor losses a dice"
-[main] CMD k46 probe pk1:liars-dice:0 color LiarsDiceTable/master%20script/p1/dice%20(0) _Color
-[main] REPLY k46 1.000 1.000 1.000 1.000
-[main] PASS a counting die is tinted cyan, the others white (relay op color): 1.000 1.000 1.000 1.000 for a 2
-[main] CMD k47 probe pk1:liars-dice:0 active LiarsDiceTable/master%20script/p1/Canvas/Continue
-[main] REPLY k47 True
+[main] PASS the result shows on the display: "Main Editor is not a liar:\n Bid: 2 X 4 die\n Actual 2 X 4 die\nMain Editor losses a dice"
+[main] CMD k47 probe pk1:liars-dice:0 color LiarsDiceTable/master%20script/p1/dice%20(0) _Color
+[main] REPLY k47 0.000 1.000 1.000 1.000
+[main] PASS a counting die is tinted cyan, the others white (relay op color): 0.000 1.000 1.000 1.000 for a 1
+[main] CMD k48 probe pk1:liars-dice:0 active LiarsDiceTable/master%20script/p1/Canvas/Continue
+[main] REPLY k48 True
 [main] PASS Continue shows:
-[main] CMD k48 shot single_result 0.9 1.7 0.2 0 0.85 1.3 55
-[main] REPLY k48 Library/PortKit/shots/liarsdice-single_single_result.jpg
-[main] CMD k49 probe pk1:liars-dice:0 pos LiarsDiceTable/master%20script/p1/Canvas/Rules/selector
-[main] REPLY k49 0.080 0.894 0.813
-[main] CMD k50 look 0.080 0.894 0.813
-[main] REPLY k50 ok camera at 0.00,1.60,0.00
-[main] CMD k51 click 0.080 0.894 0.813
-[main] REPLY k51 ok screen 585,512 of 1169x1024
+[main] CMD k49 shot single_result 0.9 1.7 0.2 0 0.85 1.3 55
+[main] REPLY k49 Library/PortKit/shots/liarsdice-single_single_result.jpg
+[main] CMD k50 probe pk1:liars-dice:0 pos LiarsDiceTable/master%20script/p1/Canvas/Rules/selector
+[main] REPLY k50 0.080 0.894 0.813
+[main] CMD k51 look 0.080 0.894 0.813
+[main] REPLY k51 ok camera at 0.00,1.60,0.00
+[main] CMD k52 click 0.080 0.894 0.813
+[main] REPLY k52 ok screen 585,512 of 1169x1024
 [main] INFO click p1 rules: ok screen 585,512 of 1169x1024
-[main] CMD k52 probe pk1:liars-dice:0 text LiarsDiceTable/billboard%20display/Text%20rules
-[main] REPLY k52 To begin each round, all players roll their dice simultaneously.
+[main] CMD k53 probe pk1:liars-dice:0 text LiarsDiceTable/billboard%20display/Text%20rules
+[main] REPLY k53 To begin each round, all players roll their dice simultaneously.
 [main] PASS the rules button shows the first rule line: To begin each round, all players roll their dice simultaneously.
-[main] CMD k53 probe pk1:liars-dice:0 pos LiarsDiceTable/Menu%20Options/CreditsButton
-[main] REPLY k53 -0.408 0.848 0.694
-[main] CMD k54 look -0.408 0.848 0.694
-[main] REPLY k54 ok camera at 0.00,1.60,0.00
-[main] CMD k55 click -0.408 0.848 0.694
-[main] REPLY k55 ok screen 585,512 of 1169x1024
+[main] CMD k54 probe pk1:liars-dice:0 pos LiarsDiceTable/Menu%20Options/CreditsButton
+[main] REPLY k54 -0.408 0.848 0.694
+[main] CMD k55 look -0.408 0.848 0.694
+[main] REPLY k55 ok camera at 0.00,1.60,0.00
+[main] CMD k56 click -0.408 0.848 0.694
+[main] REPLY k56 ok screen 585,512 of 1169x1024
 [main] INFO click Credits: ok screen 585,512 of 1169x1024
-[main] CMD k56 probe pk1:liars-dice:0 active LiarsDiceTable/Menu%20Options/CreditsPanel
-[main] REPLY k56 False
 [main] CMD k57 probe pk1:liars-dice:0 active LiarsDiceTable/Menu%20Options/CreditsPanel
 [main] REPLY k57 True
 [main] CMD k58 probe pk1:liars-dice:0 pos LiarsDiceTable/Menu%20Options/CreditsPanel

@@ -862,7 +862,6 @@ export class LiarsDiceMaster extends Behaviour {
     else if (this.phase === Phase.Bidding || this.phase === Phase.Revealing) this.WatchVoidSeats();
     this.LocalDuties();
     if (!this.Networking.IsOwner(this.gameObject)) return;
-    this.PublishDrawTable();
     this.Reconcile();
     if (this.phase === Phase.Rolling) this.CheckCommits();
     else if (this.phase === Phase.Revealing) this.CheckReveals();
@@ -1105,24 +1104,6 @@ export class LiarsDiceMaster extends Behaviour {
     this.UpdateText("Liar's Dice");
   }
 
-  /**
-   * Workaround for a kit gap (reported; portkit `secrets.ts` officiate and `refrecord.ts`): a new referee carries on the
-   * previous referee's number table but publishes it only when an entry changes. A page that starts in between (a
-   * reload, typically of the referee that just left) reads an empty table: its saved draw cannot come back, and every
-   * entry numbered before looks new to it, so a witnessed entry is judged as the referee's own and rejected. The game's
-   * referee publishes the table it carries as soon as it is the referee. Remove once the kit does this itself.
-   */
-  private PublishDrawTable(): void {
-    const secrets = this.Secrets as unknown as {
-      numbers?: { working(): Record<string, unknown>; write(table: Record<string, unknown>): void };
-      presence?: { localSid: string; extra(sid: string, name: string): unknown };
-    };
-    const numbers = secrets.numbers;
-    const presence = secrets.presence;
-    if (!numbers || !presence || presence.extra(presence.localSid, "fn") !== undefined) return;
-    const table = numbers.working();
-    if (Object.keys(table).length) numbers.write(table);
-  }
   // #endregion
 
   // #region manual network update (M:591-795)

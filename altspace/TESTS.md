@@ -1,6 +1,7 @@
 # liars-dice: test evidence
 
-Everything here ran on 2026-11-24 (third pass) and again on 2026-11-25 (fourth pass: portkit `812f285`, the review's findings) on Windows, Unity 6000.3.21f1, Creator SDK 4.0.29, in the Unity editor. Nothing ran
+Everything here ran on 2026-11-24 (third pass) again on 2026-11-25 (fourth pass: portkit `812f285`, the review's findings) and again the same day (fifth pass: portkit
+`c971100`, the game's `PublishDrawTable` workaround removed; PORT.md section 13) on Windows, Unity 6000.3.21f1, Creator SDK 4.0.29, in the Unity editor. Nothing ran
 in the Altspace app, on a Quest, or with controllers (rung 5: not run; worlds stay Private).
 
 How to run each rung again:
@@ -25,8 +26,8 @@ lint: src, portkit/src clean (page and clock rules)
 
 ## Rung 1: Node (no Unity)
 
-`npm test` in `altspace/ts`, on the kit builder's real `bindings.json` (portkit `812f285`): **31 tests, 31 pass, 0 fail**
-(2026-11-25; run three times in a row, 31 of 31 each time).
+`npm test` in `altspace/ts`, on the kit builder's real `bindings.json` (portkit `c971100`): **31 tests, 31 pass, 0 fail**
+(2026-11-25, fifth pass; run three times in a row, 31 of 31 each time; fourth pass on `812f285` the same).
 
 - Golden vectors (`test/golden.test.ts`, V1 to V5 against upstream's own C#, compiled unchanged with dotnet 8): turn order,
   counting, bid acceptance and the ten button colours, challenge resolution, the display text.
@@ -68,12 +69,20 @@ ok 31 - secrecy watch: a referee that writes a die into dieValues during the bid
 Test 29 is the review's leak probe made a test: it records every space-state batch, user-state write and one-shot every
 page sends, and on every 50 ms tick while a round is rolling or bidding checks that every page's `dieValues` is all -1,
 that no player's user state holds a reveal (`x.fr`), and that no page can compute another player's draw; then that no
-secret or draw seed is in any message. 30 and 31 show the same watch catching a leak of each kind. Test 23 also fails if
-the game's workaround for the kit gap (PORT.md section 12) is taken out.
+secret or draw seed is in any message. 30 and 31 show the same watch catching a leak of each kind. Test 23 failed in the
+fourth pass if the game's workaround for the kit gap (PORT.md section 12) was taken out; in the fifth pass the workaround is
+gone and test 23 passes on the kit's own fix (portkit `1277495`: a new referee publishes the table it carries at once).
 
 Every scenario ends with all clients on the same state digest; the honest ones with no error logged.
 
 ## Rung 2: the kit in edit mode
+
+Fifth pass (2026-11-25, portkit `c971100`): Build Prefabs, `npm run build`, Build Bundles, `PortKit/Kit/Check` **PASS twice**
+(0 disallowed graph nodes; 187 bindings resolve, hash unchanged `ba1dd43fa12436841c6b7677c39e7d3ede94d00f`; both bundles
+PASS BundleChecker with the notices and the seven licence texts). The relay graph now has 52 distinct members (was 49:
+`pkHead`, per-target `rbLaunch`), all on the allow list; graph blobs 353 KiB (were 321). Bundle sizes: Android 1,888 to
+**1,893 KiB**, Windows 3,724 to **3,732 KiB** (the larger relay graph). `PortKit/Liars Dice/Check Licences`: PASS, 71
+dependencies. The kit has no grabbables, so the new `BSPlayerEvents` on grabbables does not apply.
 
 Fourth pass (2026-11-25): Build Prefabs, Build Bundles, then `PortKit/Kit/Check` (`Logs/portkit_check.txt`):
 
@@ -111,8 +120,9 @@ which drives the table through the SDK's desktop player with portkit's InputSim 
 its own rays and raises the clicks) and reads Unity back with the `probe` command (texts, active flags, each die's
 material `_frame` and `_Color`, the face buttons' uGUI colour). Seating two players on one page is not possible (one
 seat per player, F06), so the page plays alone with `min-players="1"` (a port setting; default 2 as upstream).
-Fourth pass: **RESULT 23 passed, 0 failed, twice in a row** (2026-11-25; third pass 22 of 22), on the rebuilt bundles (`playtest/evidence_single.txt`, screenshot
-`playtest/evidence_single_result.jpg`).
+Fifth pass: **RESULT 23 passed, 0 failed, twice in a row** (2026-11-25, portkit `c971100`; fourth pass 23 of 23, third pass
+22 of 22), on the rebuilt bundles (`playtest/evidence_single.txt`, screenshot `playtest/evidence_single_result.jpg`, both
+from this pass).
 
 Lines from the third pass's log, with this pass's new and changed lines marked (this pass's full log is the evidence file):
 
@@ -156,7 +166,12 @@ The main editor and a Multiplayer Play Mode clone (`PortKit/Multiplayer/Activate
 (`rejoin-grace="60"`, since a page reload in Play mode can take longer than the default 20 s). The page whose session id
 sorts first takes station 1 and starts; the other takes station 2. Station 1 bids 2 X 3 through its panel; station 2 calls
 it; station 2 then reloads its page during the result, comes back to its station (same user, new session and player id),
-and presses Continue. Fourth pass: **RESULT 43 passed, 0 failed, twice in a row** (2026-11-25; third pass 39 of 39), on
+and presses Continue. Fifth pass: **RESULT 43 passed, 0 failed, twice in a row** (2026-11-25, portkit `c971100`;
+`playtest/evidence_multi.txt` is the second run, in which the main editor took station 2 and reloaded). The first run of
+this pass failed one check, 42 of 43: the reloaded page read its own dice in the tick the phase turned to bidding, before
+the referee's number table (user state) reached it (`[3,0,0,3,7] for 0 dice`: Unity already showed its four dice). The
+test now waits up to 5 s for the page's own dice before comparing them with Unity (round 1 and round 2), as the Node
+helpers do; the check is unchanged. Fourth pass: **RESULT 43 passed, 0 failed, twice in a row** (2026-11-25; third pass 39 of 39), on
 the rebuilt bundles (`playtest/evidence_multi.txt`, the second run, in which the main editor took station 2 and reloaded).
 New in this pass: digests are compared at equal `version()` (`stamp()`), each page's own check of the result must say
 `ok` before the reload, the reloaded page (which did not see the bidding) must say `partial` or `ok` and never `failed`,
@@ -204,6 +219,12 @@ dice have `_frame` 6, "?") and on the page (`myDice` of the other seat is null: 
 scenario 7 also checks that no client's fair-draw status gives another player's draw before the reveal).
 
 ## Artifacts
+
+Fifth pass: Take Photos, then `PortKit/Kit/Export Artifacts` to `altspace/dist/` (not committed): `android/liars-dice`
+(1,938,413 bytes), `windows/liars-dice` (3,821,542 bytes), `pk-liars-dice.js` (445,826 bytes), `liars-dice.jpg`,
+`liars-dice.snippet.html`, `manifest.json` (checks android PASS, windows PASS, bindings unchanged), and new
+`licenses/liars-dice/` with the seven licence texts (12 files; footprint 1.6 x 1.43 x 1.6 m). The kit photo shows
+upstream's placeholder text on the round display ("MehStrongBadMeh Starts the round"), which the page clears at start.
 
 Fourth pass: `PortKit/Kit/Export Artifacts` to `altspace/dist/` (not committed): `android/liars-dice` (1,933,186 bytes;
 third pass 1,911,803), `windows/liars-dice` (3,813,038 bytes; third pass 3,783,254), `pk-liars-dice.js` (433,993 bytes,

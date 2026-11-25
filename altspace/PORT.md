@@ -1,5 +1,8 @@
 # Liar's dice: port analysis
 
+Status (2026-11-25, fifth pass): re-synced to portkit `c971100`; the game's workaround for the referee's number table
+(`PublishDrawTable`) is gone, the kit does it (section 13); rungs 0 to 4 passed again on the rebuilt bundles.
+
 Status (2026-11-25, fourth pass): re-synced to portkit `812f285`; every finding of the independent review fixed or
 stated (section 12); rungs 0 to 4 passed again on the rebuilt bundles.
 
@@ -1119,7 +1122,7 @@ dragged), ProximityEnable (the tests run with `ui-range="0"`), three or four pla
 | 5 | Secrecy test S1 could not catch a leak into `dieValues` or user state during bidding | The review's leak probe became T8: it records every message every page sends and checks on every tick before the challenge that every page's `dieValues` is all -1, no user state holds a reveal, and no page can compute another's draw; T9 and T10 show it catches a reveal published early and a die written into `dieValues`. S1 also checks `dieValues` | T8, T9, T10 |
 | 6 | Liberation Sans ships as the fallback atlas with no copyright line in the notices | Copyright line in `THIRD-PARTY-NOTICES.md` and the credits panel; every licence text the notices name is in `Assets/Kit/Licenses/` and in both bundles (section 6a) | rung 2 (`portkit_bundles.txt` lists the texts) |
 
-### Kit gap found (not fixed in portkit; worked around here)
+### Kit gap found (worked around here until the fifth pass; fixed in portkit `1277495`, section 13)
 
 **A new referee does not publish the number table it carries on until an entry changes** (`portkit/ts/src/secrets.ts`
 `officiate()`, `refrecord.ts` `RefereeTable`). A page that starts in between reads an empty table: a reloaded page's
@@ -1148,3 +1151,27 @@ Rung 2: Build Prefabs, Build Bundles, `PortKit/Kit/Check` PASS twice (0 disallow
 unchanged; bundles PASS BundleChecker with the notices and seven licence texts: Android 1,888 KiB, Windows 3,724 KiB, were
 1,867 and 3,695), `PortKit/Liars Dice/Check Licences` PASS. Rung 3: 23 of 23, twice in a row. Rung 4: 43 of 43, twice in a
 row (stamps compared at equal versions; each page's result check `ok`, the reloaded page's `partial`). Artifacts exported.
+
+## 13. Fifth pass: re-sync to portkit `c971100` (2026-11-25)
+
+`portkit/tools/sync.sh liars-dice` (both `unity/` and `ts/`).
+
+| Kit change | Done here |
+|---|---|
+| A new referee publishes the number table it carries at once, and `newEpoch()` takes no baseline until the current referee has published (portkit `1277495`, the kit gap of section 12) | **Workaround removed:** `LiarsDiceMaster.PublishDrawTable()` and its call in `Update` (it reached into `Secrets`' private `numbers`). Test 23 (T2, "the referee reloads its page mid-round on the same device: its seat and dice come back, and they count") is kept and passes on the kit's version |
+| Grabbables gain `BSPlayerEvents` (the SDK's null `onClick`) | Nothing: the kit has no grabbables (65 clickables on the UI layer, which already worked) |
+| Relay graph gains `pkHead`, per-target `rbLaunch` | Rebuilt: 52 distinct members (was 49), all on the allow list; graph blobs 353 KiB (were 321) |
+| `dist/` gains `licenses/<slug>/` | Export Artifacts writes the seven licence texts to `dist/licenses/liars-dice/` |
+| Commands wait for the sender's earlier writes; `digest()`/`version()` include per-player fields; `checkDeal`, `HeadOf`, `InReach`, `Attachable`, `StartOff`, `FootprintRoot` | Nothing used by this game |
+
+Rung 4's Play-mode test read the reloaded page's own dice in the tick the phase turned to bidding; on the first run of
+this pass the referee's number table (its user state) arrived a tick after the phase (space state), so the page had no
+dice yet while Unity showed them on the next probe (`[3,0,0,3,7]`, "for 0 dice"). The test now waits up to 5 s for the
+page's own dice before comparing, as the Node helpers do since the fourth pass; the check itself is unchanged.
+
+### Rungs after the fifth pass (evidence in `TESTS.md`)
+
+Rung 0/1: `npm test` 31 of 31 (typecheck, lint clean), three runs. Rung 2: Build Prefabs, Build Bundles, `PortKit/Kit/Check`
+PASS twice (0 disallowed graph nodes, 187 bindings resolve, hash unchanged `ba1dd43f`; Android 1,893 KiB, Windows 3,732 KiB,
+were 1,888 and 3,724), `PortKit/Liars Dice/Check Licences` PASS. Rung 3: 23 of 23, twice in a row. Rung 4: 43 of 43 twice in
+a row (after the wait above; the first run, 42 of 43, is described there). Photos taken, artifacts exported.

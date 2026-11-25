@@ -261,7 +261,7 @@
     const bidding = await until(() => table().phase === PHASE.Bidding, 60000, 250);
     check(!!bidding && table().seats[mine] === me.id && table().seats[theirs] !== -1, "both players are seated and the round starts", JSON.stringify(table().seats));
     // before the challenge: my dice visible in Unity, theirs "?" (frame 6); this page cannot compute theirs
-    const myDice = debug().myDice(mine);
+    const myDice = (await until(() => debug().myDice(mine), 5000, 100)) || null;
     const myFrames = await framesUntil(mine, myDice);
     const theirFrames = await framesUntil(theirs, [6, 6, 6, 6, 6]);
     check(!!myDice && JSON.stringify(myFrames) === JSON.stringify(myDice), "before the challenge this page shows its own dice", JSON.stringify(myFrames));
@@ -344,7 +344,8 @@
     await press(seat, "continue");
     const next = await until(() => table().phase === PHASE.Bidding && table().round === 2, 90000, 250);
     check(!!next, "Continue (pressed on the reloaded page) starts round 2", `phase ${table().phase}, round ${table().round}`);
-    const dice = debug().myDice(seat);
+    // the referee's number table (its user state) can reach this page a tick after the phase (space state): wait for it
+    const dice = (await until(() => debug().myDice(seat), 5000, 100)) || null;
     const want = dice ? dice.concat(new Array(5 - dice.length).fill(7)) : [];
     const frames = await framesUntil(seat, want);
     check(!!dice && JSON.stringify(frames) === JSON.stringify(want), "the reloaded page rolls and sees its own dice in round 2 (a lost die shows the red X)", `${JSON.stringify(frames)} for ${dice ? dice.length : 0} dice`);
