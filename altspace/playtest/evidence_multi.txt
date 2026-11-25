@@ -8,7 +8,7 @@ local: script and bundles from the test server http://localhost:42900
 [main] CMD k3 probe pk1:liars-dice:0 active LiarsDiceTable/master%20script/p1/Canvas/Pre-Game/Join
 [main] REPLY k3 True
 [main] PASS the kit is in the scene: the centre display (relay op text) reads Liar's Dice and Join shows: holder True, display 'Liar's Dice'
-[main] PASS two players in the room: [{"id":1,"name":"Main Editor","sid":"rsess_dfcd94aa-904e-4b98-ae24-843fc9ae8bad"},{"id":2,"name":"Player 2","sid":"rsess_72c7f088-5f43-4538-a3b2-adbe8f56b47c"}]
+[main] PASS two players in the room: [{"id":1,"name":"Main Editor","sid":"rsess_f8cfa19d-76ec-42f4-afb2-3805dce9363f"},{"id":2,"name":"Player 2","sid":"rsess_ec50ecb2-db04-4314-9da4-589d9bffdfb9"}]
 [main] INFO Main Editor plays station 2
 [main] CMD k4 probe pk1:liars-dice:0 pos LiarsDiceTable/master%20script/p2/Canvas/Pre-Game/Join/selector
 [main] REPLY k4 -0.656 0.866 1.299
@@ -19,15 +19,15 @@ local: script and bundles from the test server http://localhost:42900
 [main] INFO click p2 join: ok screen 585,512 of 1169x1024
 [main] PASS both players are seated and the round starts: [2,1,-1,-1]
 [main] CMD k7 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(0) _frame
-[main] REPLY k7 2.000
+[main] REPLY k7 0.000
 [main] CMD k8 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(1) _frame
-[main] REPLY k8 1.000
+[main] REPLY k8 3.000
 [main] CMD k9 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(2) _frame
 [main] REPLY k9 2.000
 [main] CMD k10 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(3) _frame
-[main] REPLY k10 1.000
+[main] REPLY k10 4.000
 [main] CMD k11 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(4) _frame
-[main] REPLY k11 5.000
+[main] REPLY k11 0.000
 [main] CMD k12 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(0) _frame
 [main] REPLY k12 6.000
 [main] CMD k13 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(1) _frame
@@ -38,7 +38,7 @@ local: script and bundles from the test server http://localhost:42900
 [main] REPLY k15 6.000
 [main] CMD k16 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(4) _frame
 [main] REPLY k16 6.000
-[main] PASS before the challenge this page shows its own dice: [2,1,2,1,5]
+[main] PASS before the challenge this page shows its own dice: [0,3,2,4,0]
 [main] PASS and only '?' for the other player's dice (it does not know them): [6,6,6,6,6]
 [main] CMD k17 probe pk1:liars-dice:0 text LiarsDiceTable/billboard%20display/Text%20(TMP)
 [main] REPLY k17 <color=#FFFF00>Main Editor's<color=#FFFFFF> turn
@@ -54,30 +54,30 @@ local: script and bundles from the test server http://localhost:42900
 [main] INFO click p2 callIt: ok screen 585,512 of 1169x1024
 [main] PASS Call it: both pages reach the result: phase 4
 [main] CMD k21 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(0) _frame
-[main] REPLY k21 3.000
+[main] REPLY k21 1.000
 [main] CMD k22 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(1) _frame
-[main] REPLY k22 3.000
+[main] REPLY k22 4.000
 [main] CMD k23 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(2) _frame
-[main] REPLY k23 5.000
+[main] REPLY k23 1.000
 [main] CMD k24 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(3) _frame
 [main] REPLY k24 5.000
 [main] CMD k25 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(4) _frame
-[main] REPLY k25 4.000
+[main] REPLY k25 5.000
 [main] CMD k26 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(0) _frame
-[main] REPLY k26 2.000
+[main] REPLY k26 0.000
 [main] CMD k27 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(1) _frame
-[main] REPLY k27 1.000
+[main] REPLY k27 3.000
 [main] CMD k28 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(2) _frame
 [main] REPLY k28 2.000
 [main] CMD k29 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(3) _frame
-[main] REPLY k29 1.000
+[main] REPLY k29 4.000
 [main] CMD k30 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(4) _frame
-[main] REPLY k30 5.000
-[main] PASS after the reveal this page's dice are the ones it rolled: [3,3,5,5,4,2,1,2,1,5]
-[main] PASS both pages show the same ten dice after the reveal: [3,3,5,5,4,2,1,2,1,5] / [3,3,5,5,4,2,1,2,1,5]
-[main] PASS the other player's revealed dice are the ones that player saw before the challenge: [3,3,5,5,4]
-[main] PASS the count is the threes and wild ones among the ten dice: 2 / 2
-[main] PASS both pages hold the same state after the result (digest at equal version): 696d56fa @ 7:ce918aff / 696d56fa @ 7:ce918aff
+[main] REPLY k30 0.000
+[main] PASS after the reveal this page's dice are the ones it rolled: [1,4,1,5,5,0,3,2,4,0]
+[main] PASS both pages show the same ten dice after the reveal: [1,4,1,5,5,0,3,2,4,0] / [1,4,1,5,5,0,3,2,4,0]
+[main] PASS the other player's revealed dice are the ones that player saw before the challenge: [1,4,1,5,5]
+[main] PASS the count is the threes and wild ones among the ten dice: 3 / 3
+[main] PASS both pages hold the same state after the result (digest at equal version): 5ab4d9c0 @ 7:27a5c2d5 / 5ab4d9c0 @ 7:27a5c2d5
 [main] PASS this page's own check of the referee's result passes: ok
 [main] INFO station 2 reloads its page
 [main] PASS the kit loads from a hand-written bs-snippet and the instance starts:
@@ -86,35 +86,35 @@ local: script and bundles from the test server http://localhost:42900
 [main] CMD k2 probe pk1:liars-dice:0 text LiarsDiceTable/billboard%20display/Text%20(TMP)
 [main] REPLY k2 <color=#FF0099>Player 2<color=#FFFFFF> is not a liar:
 [main]  X 3 die
-[main]  2 X 3 die
+[main]  3 X 3 die
 [main] #FFFF00>Main Editor<color=#FFFFFF> losses a dice
 [main] PASS the kit is in the scene again: holder True
-[main] PASS two players in the room: [{"id":2,"name":"Player 2","sid":"rsess_72c7f088-5f43-4538-a3b2-adbe8f56b47c"},{"id":3,"name":"Main Editor","sid":"rsess_fdcbb7fe-f5f5-4a79-a2ad-2bdb6eefdf8b"}]
+[main] PASS two players in the room: [{"id":2,"name":"Player 2","sid":"rsess_ec50ecb2-db04-4314-9da4-589d9bffdfb9"},{"id":3,"name":"Main Editor","sid":"rsess_2d2e8d58-c793-4518-bbf1-ef232c8995ef"}]
 [main] PASS after reloading its page the player has its station back (same user, new session): [2,3,-1,-1] me 3
 [main] PASS and sees the challenge's result (late join): phase 4
 [main] CMD k3 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(0) _frame
-[main] REPLY k3 3.000
+[main] REPLY k3 1.000
 [main] CMD k4 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(1) _frame
-[main] REPLY k4 3.000
+[main] REPLY k4 4.000
 [main] CMD k5 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(2) _frame
-[main] REPLY k5 5.000
+[main] REPLY k5 1.000
 [main] CMD k6 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(3) _frame
 [main] REPLY k6 5.000
 [main] CMD k7 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(4) _frame
-[main] REPLY k7 4.000
+[main] REPLY k7 5.000
 [main] CMD k8 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(0) _frame
-[main] REPLY k8 2.000
+[main] REPLY k8 0.000
 [main] CMD k9 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(1) _frame
-[main] REPLY k9 1.000
+[main] REPLY k9 3.000
 [main] CMD k10 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(2) _frame
 [main] REPLY k10 2.000
 [main] CMD k11 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(3) _frame
-[main] REPLY k11 1.000
+[main] REPLY k11 4.000
 [main] CMD k12 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(4) _frame
-[main] REPLY k12 5.000
+[main] REPLY k12 0.000
 [main] PASS the reloaded page checks the result as far as it can (it did not see the bidding): no false alarm: partial
-[main] INFO the revealed dice after the reload: [3,3,5,5,4,2,1,2,1,5]
-[main] PASS the revealed dice are drawn after the reload: [3,3,5,5,4,2,1,2,1,5]
+[main] INFO the revealed dice after the reload: [1,4,1,5,5,0,3,2,4,0]
+[main] PASS the revealed dice are drawn after the reload: [1,4,1,5,5,0,3,2,4,0]
 [main] CMD k13 probe pk1:liars-dice:0 pos LiarsDiceTable/master%20script/p2/Canvas/Continue/selector
 [main] REPLY k13 -0.586 0.877 1.299
 [main] CMD k14 look -0.586 0.877 1.299
@@ -126,14 +126,14 @@ local: script and bundles from the test server http://localhost:42900
 [main] CMD k16 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(0) _frame
 [main] REPLY k16 5.000
 [main] CMD k17 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(1) _frame
-[main] REPLY k17 3.000
+[main] REPLY k17 5.000
 [main] CMD k18 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(2) _frame
-[main] REPLY k18 2.000
+[main] REPLY k18 1.000
 [main] CMD k19 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(3) _frame
-[main] REPLY k19 0.000
+[main] REPLY k19 2.000
 [main] CMD k20 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(4) _frame
 [main] REPLY k20 7.000
-[main] PASS the reloaded page rolls and sees its own dice in round 2 (a lost die shows the red X): [5,3,2,0,7] for 4 dice
+[main] PASS the reloaded page rolls and sees its own dice in round 2 (a lost die shows the red X): [5,5,1,2,7] for 4 dice
 [main] PASS and its dice are not marked lost: Main Editor
 [main] INFO page result 10 passed, 0 failed
 [main] DONE
@@ -146,7 +146,7 @@ local: script and bundles from the test server http://localhost:42900
 [vp-mppm2fa91e7b] CMD k3 probe pk1:liars-dice:0 active LiarsDiceTable/master%20script/p1/Canvas/Pre-Game/Join
 [vp-mppm2fa91e7b] REPLY k3 True
 [vp-mppm2fa91e7b] PASS the kit is in the scene: the centre display (relay op text) reads Liar's Dice and Join shows: holder True, display 'Liar's Dice'
-[vp-mppm2fa91e7b] PASS two players in the room: [{"id":1,"name":"Main Editor","sid":"rsess_dfcd94aa-904e-4b98-ae24-843fc9ae8bad"},{"id":2,"name":"Player 2","sid":"rsess_72c7f088-5f43-4538-a3b2-adbe8f56b47c"}]
+[vp-mppm2fa91e7b] PASS two players in the room: [{"id":1,"name":"Main Editor","sid":"rsess_f8cfa19d-76ec-42f4-afb2-3805dce9363f"},{"id":2,"name":"Player 2","sid":"rsess_ec50ecb2-db04-4314-9da4-589d9bffdfb9"}]
 [vp-mppm2fa91e7b] INFO Player 2 plays station 1
 [vp-mppm2fa91e7b] CMD k4 probe pk1:liars-dice:0 pos LiarsDiceTable/master%20script/p1/Canvas/Pre-Game/Join/selector
 [vp-mppm2fa91e7b] REPLY k4 0.000 0.866 0.644
@@ -164,15 +164,15 @@ local: script and bundles from the test server http://localhost:42900
 [vp-mppm2fa91e7b] INFO click p1 start: ok screen 1280,351 of 2560x702
 [vp-mppm2fa91e7b] PASS both players are seated and the round starts: [2,1,-1,-1]
 [vp-mppm2fa91e7b] CMD k10 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(0) _frame
-[vp-mppm2fa91e7b] REPLY k10 3.000
+[vp-mppm2fa91e7b] REPLY k10 1.000
 [vp-mppm2fa91e7b] CMD k11 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(1) _frame
-[vp-mppm2fa91e7b] REPLY k11 3.000
+[vp-mppm2fa91e7b] REPLY k11 4.000
 [vp-mppm2fa91e7b] CMD k12 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(2) _frame
-[vp-mppm2fa91e7b] REPLY k12 5.000
+[vp-mppm2fa91e7b] REPLY k12 1.000
 [vp-mppm2fa91e7b] CMD k13 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(3) _frame
 [vp-mppm2fa91e7b] REPLY k13 5.000
 [vp-mppm2fa91e7b] CMD k14 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(4) _frame
-[vp-mppm2fa91e7b] REPLY k14 4.000
+[vp-mppm2fa91e7b] REPLY k14 5.000
 [vp-mppm2fa91e7b] CMD k15 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(0) _frame
 [vp-mppm2fa91e7b] REPLY k15 6.000
 [vp-mppm2fa91e7b] CMD k16 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(1) _frame
@@ -183,7 +183,7 @@ local: script and bundles from the test server http://localhost:42900
 [vp-mppm2fa91e7b] REPLY k18 6.000
 [vp-mppm2fa91e7b] CMD k19 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(4) _frame
 [vp-mppm2fa91e7b] REPLY k19 6.000
-[vp-mppm2fa91e7b] PASS before the challenge this page shows its own dice: [3,3,5,5,4]
+[vp-mppm2fa91e7b] PASS before the challenge this page shows its own dice: [1,4,1,5,5]
 [vp-mppm2fa91e7b] PASS and only '?' for the other player's dice (it does not know them): [6,6,6,6,6]
 [vp-mppm2fa91e7b] CMD k20 probe pk1:liars-dice:0 pos LiarsDiceTable/master%20script/p1/Canvas/InGame/Num%20Selection/three/selector
 [vp-mppm2fa91e7b] REPLY k20 0.100 0.883 0.738
@@ -217,34 +217,34 @@ local: script and bundles from the test server http://localhost:42900
 [vp-mppm2fa91e7b] PASS station 1 bids 2 X 3 through its panel: 2 X 3
 [vp-mppm2fa91e7b] PASS Call it: both pages reach the result: phase 4
 [vp-mppm2fa91e7b] CMD k32 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(0) _frame
-[vp-mppm2fa91e7b] REPLY k32 3.000
+[vp-mppm2fa91e7b] REPLY k32 1.000
 [vp-mppm2fa91e7b] CMD k33 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(1) _frame
-[vp-mppm2fa91e7b] REPLY k33 3.000
+[vp-mppm2fa91e7b] REPLY k33 4.000
 [vp-mppm2fa91e7b] CMD k34 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(2) _frame
-[vp-mppm2fa91e7b] REPLY k34 5.000
+[vp-mppm2fa91e7b] REPLY k34 1.000
 [vp-mppm2fa91e7b] CMD k35 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(3) _frame
 [vp-mppm2fa91e7b] REPLY k35 5.000
 [vp-mppm2fa91e7b] CMD k36 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p1/dice%20(4) _frame
-[vp-mppm2fa91e7b] REPLY k36 4.000
+[vp-mppm2fa91e7b] REPLY k36 5.000
 [vp-mppm2fa91e7b] CMD k37 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(0) _frame
-[vp-mppm2fa91e7b] REPLY k37 2.000
+[vp-mppm2fa91e7b] REPLY k37 0.000
 [vp-mppm2fa91e7b] CMD k38 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(1) _frame
-[vp-mppm2fa91e7b] REPLY k38 1.000
+[vp-mppm2fa91e7b] REPLY k38 3.000
 [vp-mppm2fa91e7b] CMD k39 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(2) _frame
 [vp-mppm2fa91e7b] REPLY k39 2.000
 [vp-mppm2fa91e7b] CMD k40 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(3) _frame
-[vp-mppm2fa91e7b] REPLY k40 1.000
+[vp-mppm2fa91e7b] REPLY k40 4.000
 [vp-mppm2fa91e7b] CMD k41 probe pk1:liars-dice:0 matfloat LiarsDiceTable/master%20script/p2/dice%20(4) _frame
-[vp-mppm2fa91e7b] REPLY k41 5.000
-[vp-mppm2fa91e7b] PASS after the reveal this page's dice are the ones it rolled: [3,3,5,5,4,2,1,2,1,5]
-[vp-mppm2fa91e7b] PASS both pages show the same ten dice after the reveal: [3,3,5,5,4,2,1,2,1,5] / [3,3,5,5,4,2,1,2,1,5]
-[vp-mppm2fa91e7b] PASS the other player's revealed dice are the ones that player saw before the challenge: [2,1,2,1,5]
-[vp-mppm2fa91e7b] PASS the count is the threes and wild ones among the ten dice: 2 / 2
-[vp-mppm2fa91e7b] PASS both pages hold the same state after the result (digest at equal version): 696d56fa @ 7:ce918aff / 696d56fa @ 7:ce918aff
+[vp-mppm2fa91e7b] REPLY k41 0.000
+[vp-mppm2fa91e7b] PASS after the reveal this page's dice are the ones it rolled: [1,4,1,5,5,0,3,2,4,0]
+[vp-mppm2fa91e7b] PASS both pages show the same ten dice after the reveal: [1,4,1,5,5,0,3,2,4,0] / [1,4,1,5,5,0,3,2,4,0]
+[vp-mppm2fa91e7b] PASS the other player's revealed dice are the ones that player saw before the challenge: [0,3,2,4,0]
+[vp-mppm2fa91e7b] PASS the count is the threes and wild ones among the ten dice: 3 / 3
+[vp-mppm2fa91e7b] PASS both pages hold the same state after the result (digest at equal version): 5ab4d9c0 @ 7:27a5c2d5 / 5ab4d9c0 @ 7:27a5c2d5
 [vp-mppm2fa91e7b] PASS this page's own check of the referee's result passes: ok
-[vp-mppm2fa91e7b] PASS the reloaded page holds the same state as this one (late join by reload; digest at equal version): 3f3db6da @ 8:886c0fa6 / 3f3db6da @ 8:886c0fa6
+[vp-mppm2fa91e7b] PASS the reloaded page holds the same state as this one (late join by reload; digest at equal version): f59fd8a0 @ 8:c67d2ddf / f59fd8a0 @ 8:c67d2ddf
 [vp-mppm2fa91e7b] PASS Continue on the reloaded page starts round 2 for both: phase 2, round 2
-[vp-mppm2fa91e7b] PASS both pages reach the same state in round 2 (digest at equal version): ca6a3ec3 @ 10:7802c5ff / ca6a3ec3 @ 10:7802c5ff
+[vp-mppm2fa91e7b] PASS both pages reach the same state in round 2 (digest at equal version): f4e41dc2 @ 10:18bc99ba / f4e41dc2 @ 10:18bc99ba
 [vp-mppm2fa91e7b] INFO page result 19 passed, 0 failed
 [vp-mppm2fa91e7b] DONE
 served: /web/pk-liars-dice.js x3, /web/playtest/liarsdice-playtest.js x3, HEAD /kits/windows/liars-dice x3

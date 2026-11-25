@@ -16,6 +16,21 @@ portkit/tools/remote.sh altspace menu "PortKit/Multiplayer/Activate Player 2"
 portkit/tools/playtest.sh altspace altspace/playtest/multi.json liars-dice   rung 4
 ```
 
+## Canvas colliders, 2026-11-25 evening (portkit 476075d)
+
+In world 9d7311 the SDK's `BSKitItem` gave every world-space canvas without a BoxCollider a solid one when the kit
+loaded: rect x scale, on the canvas's layer. rp-toolkit's head-label canvas then pushed its wearer about (measured in
+the hub's Play mode, portkit GAPS.md "Fourth pass"). Re-synced to portkit `476075d`, whose builder gives every
+world-space canvas a trigger box of its own first, and whose `PortKit/Kit/Check` fails a canvas that would end up
+solid. Rebuilt:
+
+- Build Prefabs: 7 trigger boxes added to world-space canvases, 0 canvas boxes made triggers.
+- rung 0/1: `npm test` **31 of 31** (0 failed). `npm run build`: 445826 bytes.
+- rung 2: Check all PASS (bindings `ba1dd43f`, the new "canvas colliders" line, both bundles). Android 1899 KiB, Windows 3737 KiB.
+- rung 3 (`playtest/single.json`, liarsdice-single): **23 passed, 0 failed**, 0 console error lines (`playtest/evidence_single.txt`).
+- rung 4 (`playtest/multi.json`, liarsdice-multi): **43 passed, 0 failed**, 0 console error lines (`playtest/evidence_multi.txt`).
+- `dist/` exported: 12 files (7 licence texts), footprint 1.6 x 1.43 x 1.6 m, bindings ba1dd43fa12436841c6b7677c39e7d3ede94d00f.
+
 ## Rung 0: static
 
 `npm run typecheck` (tsc, strict) and `npm run lint` (only the platform adapters touch the page or the clock): clean.
